@@ -165,6 +165,6 @@ pip-log.txt
 
 # Node Modules
 .bin
-
+node_modules/
 # Jetbrains
 .idea
