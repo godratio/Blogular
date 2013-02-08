@@ -2,6 +2,7 @@
 
 **Blogular** is a blog app that is built to have a ultra fast user interface and use very little resources on the server.
  
+Made to run on low memory environments such as the **Rasberry Pi**.
 
 ## Easy to get started  ##
 
@@ -35,6 +36,13 @@ http://YOURURL/admin.html
 
 to get to the admin section of your site.
 	
+##Developers/Contributors##
+
+We are using the latest Javascript stack tech
+
+angularJS nodeJS etc...
+
+Help us make an awesome fast lightweight blog.
 
     <?php
     $name = $_GET['name'] ?: 'World';

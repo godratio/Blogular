@@ -6,6 +6,5 @@ angular.module('blogService', ['ngResource']).
                 'get':{method:'GET',isArray:'true'},
                 'save':{method:'POST'}
             }
-
         );
     })
