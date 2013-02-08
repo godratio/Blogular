@@ -5,6 +5,7 @@
 *.pydevproject
 .project
 .metadata
+
 bin/
 tmp/
 *.tmp
@@ -161,3 +162,9 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+# Node Modules
+.bin
+
+# Jetbrains
+.idea
