@@ -1,0 +1,20 @@
+<div  ng-controller="ContentCtrl">
+    <div class="nine columns" role="content">
+
+        <article  ng-repeat="entry in entries">
+            <div style="background-image: url({{entry.titleImage}})" ng-style="getBackImg(entry._id)">
+            <h3><a href="#/blog/{{entry._id}}">{{entry.title}}</a></h3>
+            <h6>Written by <a href="#/blog/{{entry._id}}">{{entry.author}}</a> on {{entry.date}}.</h6>
+
+            <div class="row">
+                <div class="six columns">
+                    <div ng-bind-html-unsafe="entry.text"></div>
+                </div>
+            </div>
+            <hr />
+            <br />
+                </div>
+        </article>
+
+    </div>
+</div>

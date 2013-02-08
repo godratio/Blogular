@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8"/>
+
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width"/>
+
+    <title>Welcome to Admin side of Foundation Blog</title>
+
+    <!-- Included CSS Files (Uncompressed) -->
+    <!--
+    <link rel="stylesheet" href="stylesheets/foundation.css">
+    -->
+
+    <!-- Included CSS Files (Compressed) -->
+    <link rel="stylesheet" href="stylesheets/foundation.min.css">
+    <link rel="stylesheet" href="stylesheets/app.css">
+    <script src="javascripts/modernizr.foundation.js"></script>
+    <script src="angular.js"></script>
+    <script type="text/javascript" src="angular-resource.js"></script>
+    <script src="admin.js"></script>
+    <script type="text/javascript" src="javascripts/external/blogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/GlobalCtrls/TitleCtrl.js"></script>
+    <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
+    <script src="underscore.js"></script>
+</head>
+<body ng-app="blogAppAdmin">
+<!-- Nav Bar -->
+<div class="row">
+
+    <div class="twelve columns">
+        <ul class="nav-bar">
+            <li><a href="#/">Blog List</a></li>
+            <li><a href="#/add">Create Blog</a></li>
+             <li><a href="#/adminInstuctions">Instructions</a></li>
+        </ul>
+
+        <hr/>
+    </div>
+
+    <div class="twelve columns">
+
+        <div ng-controller="TitleCtrl">
+            <h1>{{title}} Admin
+
+            </h1>
+        </div>
+        <hr/>
+    </div>
+    <div ng-view>
+    </div>
+</div>
+
+<!-- End Footer -->
+
+<!-- Included JS Files (Uncompressed) -->
+<!--
+
+<script src="javascripts/jquery.js"></script>
+
+<script src="javascripts/jquery.foundation.mediaQueryToggle.js"></script>
+
+<script src="javascripts/jquery.foundation.forms.js"></script>
+
+<script src="javascripts/jquery.event.move.js"></script>
+
+<script src="javascripts/jquery.event.swipe.js"></script>
+
+<script src="javascripts/jquery.foundation.reveal.js"></script>
+
+<script src="javascripts/jquery.foundation.orbit.js"></script>
+
+<script src="javascripts/jquery.foundation.navigation.js"></script>
+
+<script src="javascripts/jquery.foundation.buttons.js"></script>
+
+<script src="javascripts/jquery.foundation.tabs.js"></script>
+
+<script src="javascripts/jquery.foundation.tooltips.js"></script>
+
+<script src="javascripts/jquery.foundation.accordion.js"></script>
+
+<script src="javascripts/jquery.placeholder.js"></script>
+
+<script src="javascripts/jquery.foundation.alerts.js"></script>
+
+<script src="javascripts/jquery.foundation.topbar.js"></script>
+
+<script src="javascripts/jquery.foundation.joyride.js"></script>
+
+<script src="javascripts/jquery.foundation.clearing.js"></script>
+
+<script src="javascripts/jquery.foundation.magellan.js"></script>
+
+-->
+
+<!-- Included JS Files (Compressed) -->
+<script src="javascripts/jquery.js"></script>
+<script src="javascripts/foundation.min.js"></script>
+<!-- load the jQuery and require.js libraries -->
+<!-- OF COURSE YOU NEED TO ADAPT NEXT LINE TO YOUR tiny_mce.js PATH -->
+
+<!-- Initialize JS Plugins -->
+<script src="javascripts/app.js"></script>
+<!-- load the Aloha Editor core and some plugins -->
+<!-- Disabling wysiwyg editor for now
+<script src="../parser_rules/simple.js"></script>
+<script src="../dist/wysihtml5-0.4.0pre.js"></script>
+-->
+<script>
+    /*  wysiwyg editor disabled for time being
+    var editor = new wysihtml5.Editor("textarea", {
+        toolbar:        "toolbar",
+        parserRules:    wysihtml5ParserRules,
+        useLineBreaks:  false
+    });
+
+    var log = document.getElementById("log");
+
+    editor
+            .on("load", function() {
+                log.innerHTML += "<div>load</div>";
+            })
+            .on("focus", function() {
+                log.innerHTML += "<div>focus</div>";
+            })
+            .on("blur", function() {
+                log.innerHTML += "<div>blur</div>";
+            })
+            .on("change", function() {
+                log.innerHTML += "<div>change</div>";
+            })
+            .on("paste", function() {
+                log.innerHTML += "<div>paste</div>";
+            })
+            .on("newword:composer", function() {
+                log.innerHTML += "<div>newword:composer</div>";
+            })
+            .on("undo:composer", function() {
+                log.innerHTML += "<div>undo:composer</div>";
+            })
+            .on("redo:composer", function() {
+                log.innerHTML += "<div>redo:composer</div>";
+            });
+            */
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<div ng-controller="EditBlogCtrl">
+
+
+    <h2>Events:</h2>
+    <div id="log"></div>
+    <h2>Edit Post</h2>
+    <form>
+        <label for="title">Title: </label>
+        <input id="title" ng-model="form.title" name="title">
+        <label for="author">Author: </label>
+        <input type="text" name="author" id="author" ng-model="form.author">
+        <label for="content">Content: </label>
+
+        <!-- add on to later for now just use regular text area
+         <div id="toolbar" style="display: none;">
+             <a data-wysihtml5-command="bold" title="CTRL+B">bold</a> |
+             <a data-wysihtml5-command="italic" title="CTRL+I">italic</a>
+             <a data-wysihtml5-action="change_view">switch to html view</a>
+         </div>
+         -->
+        <textarea id="content" placeholder="Enter text ..." ng-model="form.text" cols="50" rows="15"></textarea>
+
+        <label for="titleImage">Title Image:</label>
+        <input id="titleImage" ng-model="form.titleImage" name="titleImage">
+
+        <p>
+            <button ng-click="editPost()" resetOnSubmit="true">Submit Post</button>
+        </p>
+    </form>
+
+
+</div>
