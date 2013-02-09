@@ -20,5 +20,6 @@ var AboutCtrl = function ($scope,$http) {
 var blogEntryCtrl = function ($scope ,Blog,$routeParams) {
     var blog = Blog.get({id:$routeParams.id},function(){
         $scope.entry = blog;
+        $scope.text = blog[0].text;
     })
 }
