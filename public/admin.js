@@ -39,61 +39,15 @@ appAdmin.controller('AddBlogCtrl',function ($scope,Blog,$location) {
 appAdmin.controller('EditBlogCtrl',function ($scope, Blog,$routeParams) {
 
     var blogs = Blog.get({id:$routeParams.blogId},function(blogP){
-        console.log(blogP[0]);
        var blog = blogP[0];
-        console.log(blog.title);
         $scope.form = blog;
-        console.log($scope.form);
-
-
-
     })
-
-
-
-       // console.log(blog.$error);
-
-
-
-
 
     $scope.editPost = function(){
         $scope.form.$save();
-        /*
-        var blogs = Blog.get({id:$routeParams.blogId},function(blogP){
-            console.log(blogP[0]);
-            var blog = blogP[0];
-            console.log(blog);
-            $scope.form = blog;
-            blogP[0].$save();
-        })
-        */
-        //$scope.blog[0].text = $scope.form.text;
-        //$scope.blog[0].$save({id:$routeParams.id});
-
-        //$scope.blogResult.$save();
-        //    $scope.blogResult[0].$save();
-        /*
-        var blogs = Blog.get({blogId:$routeParams.blogId},function(){
-            var blog = blogs[0];
-            console.log(blog);
-            blog = $scope.form;
-            console.log(blog);
-            blog.$save({blogId:$routeParams.blogId});
-        })
-        */
-//
-        /*
-        var blogs = Blog.get({action:$routeParams.id},function(){
-            var blog = blogs[0];
-            console.log(blog.title);
-            blog = $scope.form;
-            blog.author = $scope.form.author;
-            console.log(blog.title);
-            blog.$save();
-        })
-        */
-
     }
 
+    $scope.deletePost = function(){
+        $scope.form.$remove();
+    }
 })
