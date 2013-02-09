@@ -100,6 +100,14 @@ app.post('/upload',function(req,res){
     });
 })
 
+app.delete('/blog/:id',function(req,res){
+    console.log('deleted'+req.params.id);
+    Blog.remove({'_id':req.params.id},function(err,doc){
+        if(err)
+            console.log(err);
+    });
+})
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
