@@ -1,4 +1,4 @@
-angular.module('blogService', ['ngResource']).
+var blogResource = angular.module('blogResource', ['ngResource']).
     factory('Blog', function($resource) {
         return  $resource('/blog/:id',
             {id:'@_id'},

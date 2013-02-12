@@ -7,14 +7,12 @@
  */
 
 var ContentCtrl = function ($scope,Blog) {
-    var blogs = Blog.get();
+    $scope.entries = Blog.get();
     $scope.getBackImg = function(_id){
-        angular.forEach(blogs,function(value,key){
+        angular.forEach($scope.entries,function(value,key){
             if(value._id == _id){
                 return value.titleImage;
             }
         })
     }
-    $scope.entries = blogs;
-    //$scope.backgroundImg = "url(http://placekitten.com/200/300)";
 }

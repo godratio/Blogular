@@ -5,7 +5,7 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-var appAdmin = angular.module('blogAppAdmin',['blogService']).
+var appAdmin = angular.module('blogAppAdmin',['blogResource']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/admin/blogList.html"}).
