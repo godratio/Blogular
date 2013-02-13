@@ -5,8 +5,7 @@
  * Time: 0:45
  * To change this template use File | Settings | File Templates.
  */
-
-var ContentCtrl = function ($scope,Blog) {
+angular.module('Plugin.Controller.BlogEntries',[]).controller('ContentCtrl',function ($scope,Blog) {
     $scope.entries = Blog.get();
     $scope.getBackImg = function(_id){
         angular.forEach($scope.entries,function(value,key){
@@ -15,4 +14,4 @@ var ContentCtrl = function ($scope,Blog) {
             }
         })
     }
-}
+})

@@ -37,8 +37,29 @@ describe('BlogListCtrl test: ',function(){
     });
 })
 
+describe('blogEntryCtrl test: ',function(){
+    beforeEach(module('blogResource'));
+    var scope, ctrl, $httpBackend;
+    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+        $httpBackend = _$httpBackend_;
+        $httpBackend.expectGET('/blog').
+            respond([{title: 'Got',text:'blah'}]);
+
+        scope = $rootScope.$new();
+        ctrl = $controller(blogEntryCtrl, {$scope: scope});
+        $httpBackend.flush();
+    }));
+
+    it('should create "blog" model fetched from xhr', function() {
+        expect(scope.entry[0].title).toEqual('Got');
+        expect(scope.text).toEqual('blah');
+
+    });
+})
+
 
 //TODO:properly create a test for $resources
+//TODO:create a test for main app mdules to test for existence of modules to be used
 describe('blogResource test', function(){
     describe('when I call blogResource', function(){
         beforeEach(module('blogResource'));

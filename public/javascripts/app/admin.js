@@ -5,7 +5,7 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-var appAdmin = angular.module('blogAppAdmin',['blogResource']).
+var appAdmin = angular.module('blogAppAdmin',['blogResource','http-auth-interceptor','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/admin/blogList.html"}).
@@ -14,6 +14,22 @@ var appAdmin = angular.module('blogAppAdmin',['blogResource']).
             when("/adminInstuctions",{templateUrl:"partials/admin/adminInstructions.html"})
     })
 
+appAdmin.directive('login',function(){
+    return {
+        restrict:"C",
+        link:function(scope,elm,attr){
+            elm.bind('click',function(){
+                console.log("click reg");
+                elm.show();
+            });
+
+            scope.$on('event:auth-loginRequired', function() {
+                login.reveal();
+            });
+
+        }
+    }
+})
 
 appAdmin.controller('AddBlogCtrl',function ($scope,Blog,$location) {
     if($scope.$$phase) {
@@ -33,7 +49,9 @@ appAdmin.controller('AddBlogCtrl',function ($scope,Blog,$location) {
         $scope.form.author = "";
         $scope.form.text = "";
     }
-
+    $scope.$on('event:auth-loginRequired',function(){
+        console.log("event listerner called");
+    })
 })
 
 appAdmin.controller('EditBlogCtrl',function ($scope, Blog,$routeParams) {

@@ -1,4 +1,4 @@
-var app = angular.module('blogApp',['blogResource']).
+var app = angular.module('blogApp',['blogResource','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/blog.html"}).
@@ -15,9 +15,6 @@ var TwitterCtrl = function ($scope,Blog ) {
 }
 
 var AboutCtrl = function ($scope,$http) {
-    var arrayLook = new Array("test","test1");
-    arrayLook.addProp = "added property";
-    console.log($scope);
 }
 
 var blogEntryCtrl = function ($scope ,Blog,$routeParams) {

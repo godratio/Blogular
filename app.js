@@ -5,7 +5,7 @@ var express = require('express')
   , path = require('path')
     ,mongoose = require('mongoose')
     ,fs = require('fs');
-
+//var MemoryStore = require('connect/middleware/session/memory');
 mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -45,6 +45,11 @@ app.configure(function(){
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
+   /*
+    app.use(express.bodyDecoder());
+    app.use(express.cookieDecoder());
+    app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 10 }) }));
+*/
 });
 
 app.configure('development', function(){
@@ -70,7 +75,8 @@ app.post('/blog',function(req,res){
     newBlogEntry.save(function(err,newBlogEntry){
         if(err)console.log(err);
     })
-    return res.end(JSON.stringify({'success':'true'}));
+    //return res.end(JSON.stringify({'success':'true'}));
+    return res.send("authreq",401);
 })
 
 app.post('/blog/:id',function(req,res){
