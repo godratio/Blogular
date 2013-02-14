@@ -5,7 +5,7 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-var appAdmin = angular.module('blogAppAdmin',['blogResource','http-auth-interceptor','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
+var appAdmin = angular.module('blogAppAdmin',['blogResource','adminResource','http-auth-interceptor','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/admin/blogList.html"}).
@@ -16,42 +16,47 @@ var appAdmin = angular.module('blogAppAdmin',['blogResource','http-auth-intercep
 
 appAdmin.directive('login',function(){
     return {
-        restrict:"C",
+        restrict:"A",
         link:function(scope,elm,attr){
-            elm.bind('click',function(){
-                console.log("click reg");
-                elm.show();
-            });
-
+            elm.hide();
             scope.$on('event:auth-loginRequired', function() {
-                login.reveal();
+                elm.slideDown();
+            });
+            scope.$on('event:auth-loginConfirmed', function() {
+                elm.slideUp();
+            });
+        }
+    }
+})
+appAdmin.controller('LoginController', function ($scope, Admin, authService) {
+        $scope.submitAuth = function() {
+            /*
+            $http.post('auth/login').success(function() {
+                authService.loginConfirmed();
+            });
+            */
+            console.log($scope.form)
+            var a = new Admin($scope.form);
+            console.log(b);
+            a.$save({action:'login'} , function(){
+                authService.loginConfirmed();
             });
 
         }
     }
-})
-
+);
 appAdmin.controller('AddBlogCtrl',function ($scope,Blog,$location) {
-    if($scope.$$phase) {
-        //don't worry, the value gets set and AngularJS picks up on it...
 
-    }
-    else {
-        //this will fire to tell angularjs to notice that a change has happened
-        //if it is outside of it's own behaviour...
-        $scope.$apply();
-    }
     $scope.submitPost = function(){
+        console.log($scope.form);
         b = new Blog($scope.form);
         console.log(b);
-        b.$save();
-        $scope.form.title = "";
-        $scope.form.author = "";
-        $scope.form.text = "";
+        b.$save(function(){
+            $scope.form.title = "";
+            $scope.form.author = "";
+            $scope.form.text = "";
+        });
     }
-    $scope.$on('event:auth-loginRequired',function(){
-        console.log("event listerner called");
-    })
 })
 
 appAdmin.controller('EditBlogCtrl',function ($scope, Blog,$routeParams) {

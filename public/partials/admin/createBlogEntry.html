@@ -4,7 +4,7 @@
     <h2>Events:</h2>
     <div id="log"></div>
     <h2>Create Post</h2>
-    <form>
+
         <label for="title">Title: </label>
         <input id="title" ng-model="form.title" name="title">
         <label for="author">Author: </label>
@@ -24,9 +24,7 @@
         <input id="titleImage" ng-model="form.titleImage" name="titleImage">
 
         <p>
-            <button ng-click="submitPost()" resetOnSubmit="true">Submit Post</button>
+            <a ng-click="submitPost()" class="button" resetOnSubmit="true"></a>
         </p>
-    </form>
-
 
 </div>

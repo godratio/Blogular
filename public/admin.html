@@ -23,8 +23,11 @@
     -->
 
     <!-- Included CSS Files (Compressed) -->
+    
     <link rel="stylesheet" href="stylesheets/foundation.min.css">
     <link rel="stylesheet" href="stylesheets/app.css">
+    <script src="javascripts/foundation.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="javascripts/modernizr.foundation.js"></script>
     <script src="javascripts/app/angular.js"></script>
     <script type="text/javascript" src="javascripts/app/angular-resource.js"></script>
@@ -51,8 +54,26 @@
 
     <div class="twelve columns">
 
-        <a href="#" class="button login" data-reveal-id="myModal2">Click Me For A Modal</a>
 
+        <div login>TEST DIV
+            <div id="login-inner" ng-controller="LoginController">
+                Note: there is no need to enter any credentials.<br>&nbsp;
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <th>Username</th>
+                            <td><input type="text" class="login-inp" ng-model="form.username"/></td>
+                        </tr>
+                        <tr>
+                            <th>Password</th>
+                            <td><input type="password" class="login-inp" ng-model="form.password"/></td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td><a class="button" ng-click="submitAuth()"/></td>
+                        </tr>
+                    </table>
+            </div>
+        </div>
         <div ng-controller="TitleCtrl">
             <h1>{{title}} Admin
 
@@ -108,8 +129,9 @@
 -->
 
 <!-- Included JS Files (Compressed) -->
-<script src="javascripts/jquery.js"></script>
-<script src="javascripts/foundation.min.js"></script>
+<!-- <script src="javascripts/jquery.js"></script> -->
+
+
 <!-- load the jQuery and require.js libraries -->
 <!-- OF COURSE YOU NEED TO ADAPT NEXT LINE TO YOUR tiny_mce.js PATH -->
 
