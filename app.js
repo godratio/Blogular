@@ -108,12 +108,17 @@ app.post('/auth/login',function(req,res){
 })
 
 app.post('/blog',restrict,function(req,res){
-    console.log(req.session.loggedIn);
+    //console.log(req.session.loggedIn);
+    console.log(req.body);
+    var title = req.body.title;
+    if(title === '' || title === null || title === undefined)return res.send('need a title',404);
+    else{
         var newBlogEntry = new Blog(req.body);
         newBlogEntry.save(function(err,newBlogEntry){
             if(err)console.log(err);
         })
         return res.end(JSON.stringify({'success':'true'}));
+    }
 })
 
 app.post('/blog/:id',restrict,function(req,res){
