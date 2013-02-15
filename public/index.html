@@ -34,13 +34,14 @@
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/TitleCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/loader.js"></script>
+    <script type="text/javascript" src="javascripts/external/directives/scope.onready.js"></script>
     <script src="underscore.js"></script>
 </head>
 <body ng-app="blogApp">
 
 <!-- Nav Bar -->
 <div class="row">
-    <div class="twelve columns">
+    <div class="twelve columns " become-main-content>
         <ul class="nav-bar">
             <li><a href="#/">Blog</a></li>
             <li><a href="#/about">About Me</a></li>
@@ -49,7 +50,7 @@
         </ul>
         <div ng-controller="TitleCtrl">
             <h1>{{title}}
-                <small>{{subtitle}}</small>
+                <small >{{subtitle}}</small>
             </h1>
         </div>
         <hr/>

@@ -52,7 +52,7 @@ appAdmin.controller('LoginController', function ($scope, Admin, authService) {
              */
             console.log($scope.form);
             var a = new Admin($scope.form);
-            
+
             //noinspection JSUnresolvedFunction
             a.$save({action:'login'}, function () {
                 authService.loginConfirmed();

@@ -19,3 +19,4 @@ var loader = angular.module('loaderModule',[])
         }
     }
 });
+
