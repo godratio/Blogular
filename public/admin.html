@@ -26,6 +26,7 @@
     
     <link rel="stylesheet" href="stylesheets/foundation.min.css">
     <link rel="stylesheet" href="stylesheets/app.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/admin/style.css" media="all">
     <script src="javascripts/foundation.min.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="javascripts/modernizr.foundation.js"></script>
@@ -37,17 +38,20 @@
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/TitleCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/angular-http-auth.js"></script>
+    <script type="text/javascript" src="javascripts/external/directives/loader.js"></script>
     <script src="underscore.js"></script>
 </head>
-<body ng-app="blogAppAdmin">
+
+<body ng-app="blogAppAdmin" ng-controller="AdminAppCtrl">
 <!-- Nav Bar -->
 <div class="row">
+
 
     <div class="twelve columns">
         <ul class="nav-bar">
             <li><a href="#/">Blog List</a></li>
             <li><a href="#/add">Create Blog</a></li>
-             <li><a href="#/adminInstuctions">Instructions</a></li>
+             <li><a href="#/adminInstructions">Instructions</a></li>
         </ul>
 
         <hr/>
@@ -56,7 +60,7 @@
     <div class="twelve columns">
 
 
-        <div login>TEST DIV
+        <div login>
             <div id="login-inner" ng-controller="LoginController">
 
                     <table border="0" cellpadding="0" cellspacing="0">
@@ -70,7 +74,7 @@
                         </tr>
                         <tr>
                             <th></th>
-                            <td><a class="button" ng-click="submitAuth()"/></td>
+                            <td><a class="button" ng-click="submitAuth()"></a></td>
                         </tr>
                     </table>
             </div>

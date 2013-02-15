@@ -5,11 +5,21 @@
  * Time: 0:45
  * To change this template use File | Settings | File Templates.
  */
-angular.module('Plugin.Controller.BlogEntries',[]).controller('ContentCtrl',function ($scope,Blog) {
-    $scope.entries = Blog.get();
-    $scope.getBackImg = function(_id){
-        angular.forEach($scope.entries,function(value,key){
-            if(value._id == _id){
+angular.module('Plugin.Controller.BlogEntries', []).controller('ContentCtrl', function ($scope, Blog,$q) {
+    $scope.getEntries = function () {
+        var deferred = $q.defer();
+        console.log("getBlogListEntriesCalled");
+        $scope.entries = Blog.get(function(){
+            deferred.resolve("success");
+        },
+        function(){
+            deferred.reject("failed check connection");
+        });
+        return deferred.promise;
+    }
+    $scope.getBackImg = function (_id) {
+        angular.forEach($scope.entries, function (value, key) {
+            if (value._id == _id) {
                 return value.titleImage;
             }
         })

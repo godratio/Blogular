@@ -1,4 +1,4 @@
-var app = angular.module('blogApp',['blogResource','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
+var app = angular.module('blogApp',['blogResource','loaderModule','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/blog.html"}).

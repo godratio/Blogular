@@ -31,13 +31,12 @@ var blogSchema = mongoose.Schema({
 var adminSchema = mongoose.Schema({
     username:String,
     password:String
-})
+});
 
 var Blog = mongoose.model('Blog', blogSchema);
 var Admin = mongoose.model('Admin',adminSchema);
 
 var app = express();
-var notLoggedIn = false;
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -69,35 +68,35 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/blog',function(req,res){
-    var blogposts = Blog.find().lean().exec(function(err,posts){
+app.get('/blog', function (req, res) {
+    var blogposts = Blog.find().lean().exec(function (err, posts) {
         return res.end(JSON.stringify(posts));
     });
 
-})
+});
 
-app.get('/blog/:id',function(req,res){
+app.get('/blog/:id', function (req, res) {
     var id = req.params.id;
-    var blogPost = Blog.find({'_id':id}).lean().exec(function(err,post){
+    var blogPost = Blog.find({'_id':id}).lean().exec(function (err, post) {
         return res.end(JSON.stringify(post));
     })
-})
+});
 
-app.post('/auth/login',function(req,res){
+app.post('/auth/login', function (req, res) {
     /*
-    var userEntry = new Admin({username:'ray',password:'abc'});
-    userEntry.save(function(err,userEntry){
-        if(err)console.log(err);
-    })
-    */
+     var userEntry = new Admin({username:'ray',password:'abc'});
+     userEntry.save(function(err,userEntry){
+     if(err)console.log(err);
+     })
+     */
     console.log(req.body);
-    var admin = Admin.findOne({'username':req.body.username,'password':req.body.password},function(err,administrator){
-        if(err)console.log(err);
+    var admin = Admin.findOne({'username':req.body.username, 'password':req.body.password}, function (err, administrator) {
+        if (err)console.log(err);
         console.log(administrator);
-        if(administrator){
+        if (administrator) {
             console.log("logged in");
             req.session.loggedIn = true;
-        }else{
+        } else {
             console.log("not in");
             req.session.loggedIn = false;
         }
@@ -105,56 +104,56 @@ app.post('/auth/login',function(req,res){
         return res.send(200);
     });
 
-})
+});
 
-app.post('/blog',restrict,function(req,res){
+app.post('/blog', restrict, function (req, res) {
     //console.log(req.session.loggedIn);
     console.log(req.body);
     var title = req.body.title;
-    if(title === '' || title === null || title === undefined)return res.send('need a title',404);
-    else{
+    if (title === '' || title === null || title === undefined)return res.send('need a title', 404);
+    else {
         var newBlogEntry = new Blog(req.body);
-        newBlogEntry.save(function(err,newBlogEntry){
-            if(err)console.log(err);
-        })
+        newBlogEntry.save(function (err, newBlogEntry) {
+            if (err)console.log(err);
+        });
         return res.end(JSON.stringify({'success':'true'}));
     }
-})
+});
 
-app.post('/blog/:id',restrict,function(req,res){
-        delete req.body._id;
-        Blog.findOneAndUpdate({'_id':req.params.id},req.body,function(err,doc){
-            if(err)
-                console.log(err);
-        });
-})
+app.post('/blog/:id', restrict, function (req, res) {
+    delete req.body._id;
+    Blog.findOneAndUpdate({'_id':req.params.id}, req.body, function (err, doc) {
+        if (err)
+            console.log(err);
+    });
+});
 
-app.post('/addBlogPost',restrict,function(req,res){
+app.post('/addBlogPost', restrict, function (req, res) {
     var newBlogEntry = new Blog(req.body);
-    newBlogEntry.save(function(err,newBlogEntry){
-        if(err)console.log(err);
-            console.log(req.body);
-    })
+    newBlogEntry.save(function (err, newBlogEntry) {
+        if (err)console.log(err);
+        console.log(req.body);
+    });
     return res.end(JSON.stringify({'success':'true'}));
-})
+});
 
-app.post('/upload',restrict,function(req,res){
+app.post('/upload', restrict, function (req, res) {
     var name = req.files.userPhoto.name;
     fs.readFile(req.files.userPhoto.path, function (err, data) {
-        var newPath = __dirname + "/public/uploads/"+name;
+        var newPath = __dirname + "/public/uploads/" + name;
         fs.writeFile(newPath, data, function (err) {
             res.redirect("back");
         });
     });
-})
+});
 
-app.delete('/blog/:id',restrict,function(req,res){
-    console.log('deleted'+req.params.id);
-    Blog.remove({'_id':req.params.id},function(err,doc){
-        if(err)
+app.delete('/blog/:id', restrict, function (req, res) {
+    console.log('deleted' + req.params.id);
+    Blog.remove({'_id':req.params.id}, function (err, doc) {
+        if (err)
             console.log(err);
     });
-})
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
