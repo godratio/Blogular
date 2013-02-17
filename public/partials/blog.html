@@ -1,5 +1,5 @@
 <div  ng-controller="ContentCtrl">
-    <div class="nine columns" role="content" loader="getEntries()">
+    <div class="nine columns"  role="content" loader="getEntries()">
 
         <article  ng-repeat="entry in entries">
             <div style="background-image: url({{entry.titleImage}})" ng-style="getBackImg(entry._id)">

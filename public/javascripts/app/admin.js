@@ -29,6 +29,9 @@ appAdmin.directive('login', function () {
     }
 });
 
+appAdmin.factory('show',function(){
+    return {state:false};
+})
 
 appAdmin.controller('AdminAppCtrl',function($scope){
     $scope.safeApply = function(fn) {
@@ -45,15 +48,8 @@ appAdmin.controller('AdminAppCtrl',function($scope){
 
 appAdmin.controller('LoginController', function ($scope, Admin, authService) {
         $scope.submitAuth = function () {
-            /*
-             $http.post('auth/login').success(function() {
-             authService.loginConfirmed();
-             });
-             */
             console.log($scope.form);
             var a = new Admin($scope.form);
-
-            //noinspection JSUnresolvedFunction
             a.$save({action:'login'}, function () {
                 authService.loginConfirmed();
             });//test

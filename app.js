@@ -25,7 +25,8 @@ var blogSchema = mongoose.Schema({
         votes: Number,
         favs:  Number
     },
-    titleImage:String
+    titleImage:String,
+    categories:[{name:String}]
 });
 
 var adminSchema = mongoose.Schema({
@@ -50,12 +51,26 @@ app.configure(function(){
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
+
    /*
     app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
     app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 10 }) }));
 */
+
 });
+function checkForAdmin(){
+    var admins = Admin.count({username:'ray'},function(err,count){
+        if(count < 1){
+            var admin = new Admin({username:'ray',password:'abc'}).
+                save(function(err){
+                    if(err)console.log(err);
+                });
+        }
+    });
+
+}
+
 function restrict(req, res, next) {
     if (req.session.loggedIn) {
         next();
@@ -64,6 +79,9 @@ function restrict(req, res, next) {
         res.send('authentication failed',401);
     }
 }
+
+checkForAdmin();
+
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
@@ -80,6 +98,22 @@ app.get('/blog/:id', function (req, res) {
     var blogPost = Blog.find({'_id':id}).lean().exec(function (err, post) {
         return res.end(JSON.stringify(post));
     })
+});
+
+app.get('/cattags',function(req,res){
+    var blogPosts = Blog.find().lean().exec(function(err,posts){
+        var cattags =[];
+        for(post in posts){
+            console.log(post.categories);
+            var cache = post.categories;
+            console.log(cache);
+            for(cattag in cattags){
+                if(cattag === post.categories){
+
+                }
+            }
+        }
+    });
 });
 
 app.post('/auth/login', function (req, res) {

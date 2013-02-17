@@ -11,6 +11,7 @@ var loader = angular.module('loaderModule',[])
             promise.then(function(){
                     console.log("promise returned");
                     elm.css("background-image","none");
+                    elm.css("height","100%");
                     console.log(elm.parent());
                 },
                 function(){

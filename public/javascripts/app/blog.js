@@ -6,7 +6,8 @@ var app = angular.module('blogApp',['Scope.onReady','blogResource','loaderModule
             when("/projects",{templateUrl:"partials/projects.html"}).
             when("/shoutouts",{templateUrl:"partials/shoutouts.html"}).
             when("/admin/AddBlogEntry",{templateUrl:"partials/admin/createBlogEntry.html"}).
-            when("/blog/:id",{templateUrl:"partials/blogEntry.html"})
+            when("/blog/:id",{templateUrl:"partials/blogEntry.html"}).
+            when("/listByTag/:name",{templateUrl:"partials/blog.html"})
     });
 
 //var becomeMainContent = angular.module('becomeMainContentModule',[])
@@ -31,7 +32,17 @@ var app = angular.module('blogApp',['Scope.onReady','blogResource','loaderModule
         }
     });
 
+app.factory('show',function(){
+    return {state:false};
+})
 
+app.controller('blogViewCtrl',function($scope,show,$http){
+    $http.get("/cattags").
+        success(function(cattags){
+            console.log(cattags);
+        })
+    $scope.show = show;
+})
 //TODO:add a simple twitter feed here
 var TwitterCtrl = function ($scope,Blog ) {
     //$scope.twitterResult = Blog.get();
@@ -40,9 +51,11 @@ var TwitterCtrl = function ($scope,Blog ) {
 var AboutCtrl = function ($scope,$http) {
 }
 
-app.controller('blogEntryCtrl',function ($scope ,Blog,$routeParams) {
-    $scope.$prepareForReady();
+app.controller('blogEntryCtrl',function ($scope,show,Blog,$routeParams) {
+    show.state = true;
+    $scope.show = show;
 
+    $scope.$prepareForReady();
     Blog.get({id:$routeParams.id},function(blog){
         $scope.entry = blog;
         $scope.text = blog[0].text;

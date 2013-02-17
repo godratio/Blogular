@@ -23,7 +23,23 @@
     height: 300px;
 
 }
+.border-main{
+    border-right: 1px solid #000000;
+    border-left: 1px solid #000000;
+}
+.border-footer{
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+}
+.footer-child{
+    height: 200px;
+}
+.right-separator{
+    border-right: 1px solid #0000ff;
+}
+.gradient-main{
 
+}
 /* -----------------------------------------
    Page Name 1
 ----------------------------------------- */

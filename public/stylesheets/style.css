@@ -5,11 +5,9 @@ body {
 a {
   color: #00B7FF;
 }
-
-.subHeader {
+#blogList{
 
 }
-
 .waitingForAngularToLoad {
     background-image: url("/images/loading.gif");
     background-repeat: no-repeat;
