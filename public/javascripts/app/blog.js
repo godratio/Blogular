@@ -40,6 +40,7 @@ app.controller('blogViewCtrl',function($scope,show,$http){
     $http.get("/cattags").
         success(function(cattags){
             console.log(cattags);
+            $scope.categories = cattags;
         })
     $scope.show = show;
 })

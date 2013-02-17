@@ -36,7 +36,14 @@ var adminSchema = mongoose.Schema({
 
 var Blog = mongoose.model('Blog', blogSchema);
 var Admin = mongoose.model('Admin',adminSchema);
-
+var testcatBlog = new Blog({
+    title:  "test",
+    author: "ray g",
+    text:   "Test content",
+    categories:[{name:"sports"}]
+}).save(function(err,blog){
+        if(err)console.log(err);
+    });
 var app = express();
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -101,18 +108,37 @@ app.get('/blog/:id', function (req, res) {
 });
 
 app.get('/cattags',function(req,res){
+    var buffer = [];
     var blogPosts = Blog.find().lean().exec(function(err,posts){
         var cattags =[];
-        for(post in posts){
-            console.log(post.categories);
-            var cache = post.categories;
-            console.log(cache);
-            for(cattag in cattags){
-                if(cattag === post.categories){
+        for(var i = 0;i<posts.length;i++){
+            for(var x = 0;x<posts[i].categories.length;x++){
+                var name = posts[i].categories[x].name;
+                var added = false;
+                if(buffer.length == 0){
+                    console.log("pushedbeg");
+                    buffer.push({name:name,count:1});
+                    added = true;
+                }
+                if(added == false){
+                    for(var y = 0;y<buffer.length;y++){
+                        var buffername = buffer[y].name;
+                        var buffercount = buffer[y].count;
+                        if(buffername == name){
+                            console.log("addCountonBuffer");
+                            buffer[y].count = ++buffercount ;
+                            added = true;
+                        }
+                    }
 
+                }
+                if(added == false){
+                    console.log("pushed1");
+                    buffer.push({name:name,count:1});
                 }
             }
         }
+        res.end(JSON.stringify(buffer));
     });
 });
 
