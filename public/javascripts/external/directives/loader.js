@@ -6,17 +6,15 @@ var loader = angular.module('loaderModule',[])
             elm.css("background-image","url("+urlToLoaderImage+")")
                 .css("background-repeat","no-repeat")
                 .css("height","100px");
-            var deferred = $q.defer();
-            var promise = scope.$eval(attrs.loader);
-            promise.then(function(){
-                    console.log("promise returned");
+            scope.$eval(attrs.loader);
+            scope.$whenReady(
+                function(){
                     elm.css("background-image","none");
                     elm.css("height","100%");
-                    console.log(elm.parent());
                 },
-                function(){
-                    console.log("errror in promise");
-                })
+               function(){
+               }
+           )
         }
     }
 });

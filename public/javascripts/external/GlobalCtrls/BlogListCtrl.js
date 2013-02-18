@@ -5,26 +5,32 @@
  * Time: 0:45
  * To change this template use File | Settings | File Templates.
  */
-angular.module('Plugin.Controller.BlogEntries', []).controller('ContentCtrl', function ($scope,show, Blog,$q,$routeParams) {
-    console.log($routeParams);
-    show.state = false;
-    $scope.show = show;
-    $scope.getEntries = function () {
-        var deferred = $q.defer();
-        console.log("getBlogListEntriesCalled");
-        $scope.entries = Blog.get(function(){
-                deferred.resolve("success");
-            },
-            function(){
-                deferred.reject("failed check connection");
+angular.module('Plugin.Controller.BlogEntries', []).controller('ContentCtrl', function ($scope,show, Blog,BlogsService,$q,$routeParams) {
+    console.log($routeParams.name+"parname");
+    $scope.$prepareForReady();
+    $scope.filterTag = $routeParams.name;
+    if($routeParams.name){
+        $scope.fiterTag = $routeParams.name;
+        $scope.entries = BlogsService.getAllBlogs();
+        $scope.$onReady("filter");
+    }else{
+        show.state = false;
+        $scope.show = show;
+        $scope.getEntries = function () {
+            BlogsService.getBlogs(function(data){
+                $scope.entries = BlogsService.getAllBlogs();
+                $scope.categories = BlogsService.getCategories();
+                console.log($scope.categories);
+                $scope.$onReady("success");
             });
-        return deferred.promise;
-    }
-    $scope.getBackImg = function (_id) {
-        angular.forEach($scope.entries, function (value, key) {
-            if (value._id == _id) {
-                return value.titleImage;
-            }
-        })
+        }
+
+        $scope.getBackImg = function (_id) {
+            angular.forEach($scope.entries, function (value, key) {
+                if (value._id == _id) {
+                    return value.titleImage;
+                }
+            })
+        }
     }
 })

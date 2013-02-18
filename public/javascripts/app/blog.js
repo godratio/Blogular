@@ -1,4 +1,4 @@
-var app = angular.module('blogApp',['Scope.onReady','blogResource','loaderModule','Plugin.Controller.Title','Plugin.Controller.BlogEntries']).
+var app = angular.module('blogApp',['Scope.onReady','blogResource','loaderModule','Plugin.Controller.Title','Plugin.Controller.BlogEntries','blogService','blogFilter']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/blog.html"}).
@@ -34,14 +34,13 @@ var app = angular.module('blogApp',['Scope.onReady','blogResource','loaderModule
 
 app.factory('show',function(){
     return {state:false};
-})
+});
+app.factory('categoryService',function(){
+   return [{name:'test'}];
+});
 
-app.controller('blogViewCtrl',function($scope,show,$http){
-    $http.get("/cattags").
-        success(function(cattags){
-            console.log(cattags);
-            $scope.categories = cattags;
-        })
+app.controller('blogViewCtrl',function($scope,show,categoryService,BlogsService){
+    $scope.categories = BlogsService.getCategories();
     $scope.show = show;
 })
 //TODO:add a simple twitter feed here
@@ -52,10 +51,10 @@ var TwitterCtrl = function ($scope,Blog ) {
 var AboutCtrl = function ($scope,$http) {
 }
 
-app.controller('blogEntryCtrl',function ($scope,show,Blog,$routeParams) {
+app.controller('blogEntryCtrl',function ($scope,show,Blog,$routeParams,BlogsService) {
+    console.log(BlogsService.getCategories());
     show.state = true;
     $scope.show = show;
-
     $scope.$prepareForReady();
     Blog.get({id:$routeParams.id},function(blog){
         $scope.entry = blog;

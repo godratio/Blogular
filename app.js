@@ -110,7 +110,7 @@ app.get('/blog/:id', function (req, res) {
 app.get('/cattags',function(req,res){
     var buffer = [];
     var blogPosts = Blog.find().lean().exec(function(err,posts){
-        var cattags =[];
+
         for(var i = 0;i<posts.length;i++){
             for(var x = 0;x<posts[i].categories.length;x++){
                 var name = posts[i].categories[x].name;
