@@ -1,4 +1,4 @@
-var app = angular.module('blogApp',['Scope.onReady','blogResource','loaderModule','Plugin.Controller.Title','Plugin.Controller.BlogEntries','blogService','blogFilter']).
+var app = angular.module('blogApp',['updateService','Scope.onReady','blogResource','loaderModule','Plugin.Controller.Title','Plugin.Controller.BlogEntries','blogFilter']).
     config(function($routeProvider,$locationProvider){
         $routeProvider.
             when("/",{templateUrl:"partials/blog.html"}).
@@ -52,7 +52,7 @@ var AboutCtrl = function ($scope,$http) {
 }
 
 app.controller('blogEntryCtrl',function ($scope,show,Blog,$routeParams,BlogsService) {
-    console.log(BlogsService.getCategories());
+
     show.state = true;
     $scope.show = show;
     $scope.$prepareForReady();

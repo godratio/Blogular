@@ -78,6 +78,34 @@ angular.module('blogService',['ngResource']).
             }
         }
         return BlogsService;
+    });
+
+angular.module('updateService',['ngResource']).
+    factory('UpdateService',function($resource,$q){
+        var service =  $resource('/lastUpdateSame/:date',
+            {date:''},
+            {
+                'get':{method:'GET', isArray:'true'},
+                'save':{method:'POST'}
+            }
+        );
+        var lastUpdate = {date:Date.now()};
+        var UpdateService = {
+            checkIfUpdate : function(callback){
+                service.get({date:lastUpdate.date}, function(result){
+                    var result;
+                    if(result.result == "true"){
+                        result = false;
+                    }else{
+                        lastUpdate = result.lastUpdate;
+                        result = true;
+                    }
+                    callback(result);
+                    return result;
+                });
+            }
+        }
+        return UpdateService;
     })
 angular.module('blogFilter',[]).
     filter('byTag',function(){

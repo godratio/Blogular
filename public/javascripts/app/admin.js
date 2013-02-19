@@ -61,6 +61,14 @@ appAdmin.controller('AddBlogCtrl', function ($scope, Blog, $location, $cookies) 
 
     $scope.submitPost = function () {
         console.log($scope.form);
+        var categories = $scope.form.categories.split(',');
+        var bufferArr = [];
+        angular.forEach(categories,function(value,key){
+            var bufferObj = {name:value};
+            bufferArr.push(bufferObj);
+        });
+        //angular.copy(bufferArr,$scope.form.categories);
+        $scope.form.categories = bufferArr;
         var b = new Blog($scope.form);
         console.log(b);
         b.$save(function () {

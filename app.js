@@ -1,77 +1,78 @@
 var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path')
-    ,mongoose = require('mongoose')
-    ,fs = require('fs');
+    , routes = require('./routes')
+    , user = require('./routes/user')
+    , http = require('http')
+    , path = require('path')
+    , mongoose = require('mongoose')
+    , fs = require('fs');
 //var MemoryStore = require('connect/middleware/session/memory');
 mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
+db.once('open', function callback() {
     // yay!
     console.log("connected");
 });
 
 var blogSchema = mongoose.Schema({
-    title:  String,
-    author: String,
-    text:   String,
-    comments: [{ body: String, date: Date }],
-    date: { type: Date, default: Date.now },
-    hidden: Boolean,
-    meta: {
-        votes: Number,
-        favs:  Number
+    title:String,
+    author:String,
+    text:String,
+    comments:[
+        { body:String, date:Date }
+    ],
+    date:{ type:Date, default:Date.now },
+    hidden:Boolean,
+    meta:{
+        votes:Number,
+        favs:Number
     },
     titleImage:String,
-    categories:[{name:String}]
+    categories:[
+        {name:String}
+    ]
 });
 
 var adminSchema = mongoose.Schema({
     username:String,
     password:String
 });
+var updateSchema = mongoose.Schema({
+    lastUpdate:{type:Date, default:Date.now()}
+});
 
 var Blog = mongoose.model('Blog', blogSchema);
-var Admin = mongoose.model('Admin',adminSchema);
-var testcatBlog = new Blog({
-    title:  "test",
-    author: "ray g",
-    text:   "Test content",
-    categories:[{name:"sports"}]
-}).save(function(err,blog){
-        if(err)console.log(err);
-    });
-var app = express();
-app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.favicon());
-  app.use(express.logger('dev'));
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(express.cookieParser('your secret here'));
-  app.use(express.session());
-  app.use(app.router);
-  app.use(require('less-middleware')({ src: __dirname + '/public' }));
-  app.use(express.static(path.join(__dirname, 'public')));
+var Admin = mongoose.model('Admin', adminSchema);
+var Update = mongoose.model('Update', updateSchema);
 
-   /*
-    app.use(express.bodyDecoder());
-    app.use(express.cookieDecoder());
-    app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 10 }) }));
-*/
+var app = express();
+app.configure(function () {
+    app.set('port', process.env.PORT || 3000);
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'jade');
+    app.use(express.favicon());
+    app.use(express.logger('dev'));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.cookieParser('your secret here'));
+    app.use(express.session());
+    app.use(app.router);
+    app.use(require('less-middleware')({ src:__dirname + '/public' }));
+    app.use(express.static(path.join(__dirname, 'public')));
+
+    /*
+     app.use(express.bodyDecoder());
+     app.use(express.cookieDecoder());
+     app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 10 }) }));
+     */
 
 });
-function checkForAdmin(){
-    var admins = Admin.count({username:'ray'},function(err,count){
-        if(count < 1){
-            var admin = new Admin({username:'ray',password:'abc'}).
-                save(function(err){
-                    if(err)console.log(err);
+function checkForAdmin() {
+    var admins = Admin.count({username:'ray'}, function (err, count) {
+        if (count < 1) {
+            var admin = new Admin({username:'ray', password:'abc'}).
+                save(function (err) {
+                    if (err)console.log(err);
                 });
         }
     });
@@ -83,14 +84,14 @@ function restrict(req, res, next) {
         next();
     } else {
         req.session.error = 'Access denied!';
-        res.send('authentication failed',401);
+        res.send('authentication failed', 401);
     }
 }
 
 checkForAdmin();
 
-app.configure('development', function(){
-  app.use(express.errorHandler());
+app.configure('development', function () {
+    app.use(express.errorHandler());
 });
 
 app.get('/blog', function (req, res) {
@@ -107,39 +108,24 @@ app.get('/blog/:id', function (req, res) {
     })
 });
 
-app.get('/cattags',function(req,res){
-    var buffer = [];
-    var blogPosts = Blog.find().lean().exec(function(err,posts){
-
-        for(var i = 0;i<posts.length;i++){
-            for(var x = 0;x<posts[i].categories.length;x++){
-                var name = posts[i].categories[x].name;
-                var added = false;
-                if(buffer.length == 0){
-                    console.log("pushedbeg");
-                    buffer.push({name:name,count:1});
-                    added = true;
-                }
-                if(added == false){
-                    for(var y = 0;y<buffer.length;y++){
-                        var buffername = buffer[y].name;
-                        var buffercount = buffer[y].count;
-                        if(buffername == name){
-                            console.log("addCountonBuffer");
-                            buffer[y].count = ++buffercount ;
-                            added = true;
-                        }
-                    }
-
-                }
-                if(added == false){
-                    console.log("pushed1");
-                    buffer.push({name:name,count:1});
-                }
+app.get('/lastUpdateSame/:date', function (req, res) {
+    var dateFromClient = req.params.date;
+    var response = {};
+    var getLastUpdate = Update.findOne({}, function (err, update) {
+        if (update == null) {
+            response.result = "true";
+        } else {
+            if (dateFromClient == update.lastUpdate.getTime()) {
+                response.result = "true";
+            } else {
+                response.lastUpdate = update.lastUpdate;
+                response.result = "false";
             }
         }
-        res.end(JSON.stringify(buffer));
+        console.log(response);
+        return res.end(JSON.stringify(response));
     });
+
 });
 
 app.post('/auth/login', function (req, res) {
@@ -215,6 +201,6 @@ app.delete('/blog/:id', restrict, function (req, res) {
     });
 });
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+http.createServer(app).listen(app.get('port'), function () {
+    console.log("Express server listening on port " + app.get('port'));
 });
