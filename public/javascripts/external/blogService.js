@@ -11,7 +11,7 @@ var blogResource = angular.module('blogResource', ['ngResource']).
 
 angular.module('blogService',['ngResource']).
     factory('BlogsService',function($resource,$q,$rootScope){
-        var service =  $resource('/blog/:id',
+        var blogResource =  $resource('/blog/:id',
             {id:'@_id'},
             {
                 'get':{method:'GET', isArray:'true'},
@@ -23,7 +23,9 @@ angular.module('blogService',['ngResource']).
         var BlogsService ={
             getBlogs:function(callback){
                 var deferred = $q.defer();
-                service.get(function(blogs){
+                console.log("the errori shere ??");
+                blogResource.get(function(blogs){
+                        console.log("errorbeforcallback");
                        categories.length = 0;
                         for(var i = 0;i<blogs.length;i++){
                             for(var x = 0;x<blogs[i].categories.length;x++){
@@ -49,6 +51,7 @@ angular.module('blogService',['ngResource']).
                             }
                         }
                         allBlogs = blogs;
+
                         callback(blogs);
                     },
                     function(){
@@ -57,8 +60,18 @@ angular.module('blogService',['ngResource']).
             getCategories:function(){
                 return categories;
             },
-            getAllBlogs:function(){
-                return allBlogs;
+            getAllBlogs:function(callback){
+                if(allBlogs.length > 0){
+                    callback(allBlogs);
+                    //return allBlogs;
+                }else{
+                    this.getBlogs(function(blogs){
+                        console.log("callback GOT BLOGS");
+                        console.log(blogs);
+                        callback(blogs);
+                    })
+                }
+                //return allBlogs;
             },
             getBlogsByTag:function(tag){
 
@@ -89,19 +102,26 @@ angular.module('updateService',['ngResource']).
                 'save':{method:'POST'}
             }
         );
-        var lastUpdate = {date:Date.now()};
+        var lastUpdate = {};
+        //update last update variable upon first initialization of factory
+        (function(){
+            service.get(function(date){
+                this.lastUpdate = date[0].lastUpdate;
+            });
+        }());
         var UpdateService = {
             checkIfUpdate : function(callback){
-                service.get({date:lastUpdate.date}, function(result){
-                    var result;
-                    if(result.result == "true"){
-                        result = false;
+
+                service.get({date:lastUpdate.lastUpdate}, function(result){
+                    var resultToReturn;
+                    if(result[0].result == "true"){
+                        lastUpdate = result[0].lastUpdate;
+                        resultToReturn = true;
                     }else{
-                        lastUpdate = result.lastUpdate;
-                        result = true;
+                        resultToReturn = false;
                     }
-                    callback(result);
-                    return result;
+                    callback(resultToReturn);
+                    return resultToReturn;
                 });
             }
         }
@@ -110,23 +130,21 @@ angular.module('updateService',['ngResource']).
 angular.module('blogFilter',[]).
     filter('byTag',function(){
        return function(blogs,tag){
-           var buffer = [];
-           if(tag == undefined){
-               if(blogs){
-                   return   blogs;
-               }else{
-                   return;
-               }
-           }
-           for(var x = 0;x< blogs.length;x++){
-               for(var i = 0;i<blogs[x].categories.length;i++){
-                   if(blogs[x].categories[i].name === tag){
-                       buffer.push(blogs[x]);
+           if(blogs == undefined && tag == undefined){
+               return;
+           }else if(blogs != undefined && tag == undefined){
+               return blogs;
+           }else if(blogs != undefined && tag != undefined){
+               var buffer = [];
+               for(var x = 0;x< blogs.length;x++){
+                   for(var i = 0;i<blogs[x].categories.length;i++){
+                       if(blogs[x].categories[i].name === tag){
+                           buffer.push(blogs[x]);
+                       }
                    }
                }
-
+               return buffer;
            }
-           return buffer;
        }
     });
 var adminResource = angular.module('adminResource', ['ngResource']).

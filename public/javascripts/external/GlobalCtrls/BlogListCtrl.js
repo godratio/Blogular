@@ -9,22 +9,32 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
     .controller('ContentCtrl', function ($scope, show, Blog, BlogsService, $q, $routeParams, UpdateService) {
         console.log($routeParams.name + "parname");
         var filterByTags = function () {
-            $scope.fiterTag = $routeParams.name;
-            $scope.entries = BlogsService.getAllBlogs();
-            $scope.$onReady("filter");
+
         }
         $scope.$prepareForReady();
         $scope.filterTag = $routeParams.name;
         //check if user wants to see blogs by categories or not
         if ($routeParams.name) {
+            console.log("error?");
             UpdateService.checkIfUpdate(function (result) {
+                console.log(result);
                 if (result) {
                     BlogsService.getBlogs(function (blogs) {
                         $scope.entries = blogs;
-                        filterByTags();
+                        //**********how to encapsulate in angular??************//
+                        $scope.fiterTag = $routeParams.name;
+                        //$scope.entries = BlogsService.getAllBlogs();
+                        $scope.$onReady("filter");
+                        //**********how to encapsulate in angular??************//
                     });
                 }else{
-                   filterByTags();
+                    //**********how to encapsulate in angular??************//
+                    BlogsService.getAllBlogs(function(blogs){
+                        $scope.entries = blogs;
+                        $scope.fiterTag = $routeParams.name;
+                        $scope.$onReady("filter");
+                    });
+                    //**********how to encapsulate in angular??************//
                 }
             })
 
@@ -32,12 +42,15 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
             show.state = false;
             $scope.show = show;
             $scope.getEntries = function () {
-                BlogsService.getBlogs(function (data) {
-                    $scope.entries = BlogsService.getAllBlogs();
-                    $scope.categories = BlogsService.getCategories();
-                    console.log($scope.categories);
-                    $scope.$onReady("success");
-                });
+  //              BlogsService.getBlogs(function (data) {
+                    BlogsService.getAllBlogs(function(blogs){
+                         $scope.entries = blogs;
+                        $scope.categories = BlogsService.getCategories();
+                        console.log($scope.categories);
+                        $scope.$onReady("success");
+
+                    });
+//                    });
             }
 
             $scope.getBackImg = function (_id) {

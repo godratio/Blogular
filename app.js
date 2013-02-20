@@ -79,6 +79,17 @@ function checkForAdmin() {
 
 }
 
+function devCleanDb(){
+    Blog.find({},function(err,blogs){
+        for(var i = 0;i<blogs.length;i++){
+            if(blogs[i].categories == null){
+                blogs[i].remove();
+            }
+        }
+    });
+
+}
+
 function restrict(req, res, next) {
     if (req.session.loggedIn) {
         next();
@@ -87,7 +98,7 @@ function restrict(req, res, next) {
         res.send('authentication failed', 401);
     }
 }
-
+devCleanDb();
 checkForAdmin();
 
 app.configure('development', function () {
@@ -108,20 +119,42 @@ app.get('/blog/:id', function (req, res) {
     })
 });
 
+app.get('/lastUpdateSame',function(req,res){
+    Update.findOne({}).lean().exec(function(err,update){
+        var returnResult = [];
+        if(err)console.log(err);
+        console.log(update);
+        if(update == null){
+            var updateCreate = new Update();
+            updateCreate.save(function(err,newUpdate){
+                if(err)console.log(err);
+                returnResult.push(newUpdate);
+                res.end(JSON.stringify(returnResult));
+            })
+        }else{
+            returnResult.push(update);
+            res.end(JSON.stringify(returnResult));
+        }
+    })
+})
+
 app.get('/lastUpdateSame/:date', function (req, res) {
     var dateFromClient = req.params.date;
-    var response = {};
+    var response = [];
+
     var getLastUpdate = Update.findOne({}, function (err, update) {
+        var obj = {};
         if (update == null) {
-            response.result = "true";
+            obj.result = "false";
         } else {
             if (dateFromClient == update.lastUpdate.getTime()) {
-                response.result = "true";
+                obj.result = "false";
             } else {
-                response.lastUpdate = update.lastUpdate;
-                response.result = "false";
+                obj.lastUpdate = update.lastUpdate;
+                obj.result = "true";
             }
         }
+        response.push(obj);
         console.log(response);
         return res.end(JSON.stringify(response));
     });
