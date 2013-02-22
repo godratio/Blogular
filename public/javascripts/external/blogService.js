@@ -18,6 +18,13 @@ angular.module('blogService',['ngResource']).
                 'save':{method:'POST'}
             }
         );
+        var commentResource = $resource('/comments',
+            {id:'@_id'},
+            {
+                'get':{method:'GET',isArray:'true'},
+                'save':{method:'POST'}
+            }
+        );
         var categories = [];
         var allBlogs = [];
         var BlogsService ={
@@ -62,12 +69,14 @@ angular.module('blogService',['ngResource']).
             },
             getAllBlogs:function(callback){
                 if(allBlogs.length > 0){
-                    callback(allBlogs);
+                   // console.log(callback);
+                    if(typeof callback == 'function'){
+                        callback(allBlogs);
+                    }
                     //return allBlogs;
                 }else{
                     this.getBlogs(function(blogs){
-                        console.log("callback GOT BLOGS");
-                        console.log(blogs);
+
                         callback(blogs);
                     })
                 }
@@ -88,7 +97,39 @@ angular.module('blogService',['ngResource']).
 
                 }
                 return buffer;
+            },
+            getCommentsForBlogEntry:function(id){
+                //console.log(allBlogs);
+                for (var i = 0; i < allBlogs.length; i++) {
+                   // console.log("blogid = "+allBlogs[i]._id + " id = "+id);
+                    if(allBlogs[i]._id == id){
+                       // console.log(allBlogs[i]);
+                        return allBlogs[i].comments;
+                    }
+                }
             }
+            /*,TODO:why won allBlogs be the current value of comments ????
+
+            postComment:function(params,callback){
+               console.log(this.getCommentsForBlogEntry(params.id));
+                var buffer = [];
+                angular.copy(this.getCommentsForBlogEntry(params.id),buffer);
+                console.log(buffer);
+                buffer.push({body:params.body,date:Date.now()});
+                this.getAllBlogs(function(blogs){
+                    angular.forEach(blogs,function(value,key){
+
+                        if(value._id == params.id){
+
+                            allBlogs[key].comments = buffer;
+                            allBlogs[key].$save(function(newBlog){
+                                callback(newBlog);
+                            });
+                        }
+                    })
+                })
+            }
+            */
         }
         return BlogsService;
     });
@@ -151,6 +192,47 @@ var adminResource = angular.module('adminResource', ['ngResource']).
     factory('Admin', function ($resource) {
         return  $resource('/auth/:action',
             {action:''},
+            {
+                'get':{method:'GET', isArray:'true'},
+                'save':{method:'POST'}
+            }
+        );
+    });
+angular.module('foundationjs',[]).
+    factory('foundation',function($rootScope){
+
+
+    })
+
+angular.module('socketio',[]).
+    factory('socket',function($rootScope){
+        var socket = io.connect();
+        return {
+            on:function(eventName,callback){
+                socket.on(eventName,function(){
+                    var args = arguments;
+                    $rootScope.$apply(function(){
+                        callback.apply(socket,args);
+                    });
+                });
+            },
+            emit:function(eventName,data,callback){
+                socket.emit(eventName,data,function(){
+                    var args = arguments;
+                    $rootScope.$apply(function(){
+                        if(callback){
+                            callback.apply(socket,args);
+                        }
+                    });
+                });
+            }
+        }
+    });
+
+angular.module('userService', ['ngResource']).
+    factory('UserService',function($resource){
+        var userResource =  $resource('/users',
+            {date:''},
             {
                 'get':{method:'GET', isArray:'true'},
                 'save':{method:'POST'}

@@ -23,9 +23,19 @@
     -->
 
     <!-- Included CSS Files (Compressed) -->
+
     <link rel="stylesheet" href="stylesheets/foundation.min.css">
     <link rel="stylesheet" href="stylesheets/app.css">
+    <link rel="stylesheet" href="stylesheets/general_enclosed_foundicons.css">
+    <script src="javascripts/jquery.js"></script>
     <script src="javascripts/modernizr.foundation.js"></script>
+    <!-- Included JS Files (Compressed) -->
+    <script src="javascripts/foundation.min.js"></script>
+    <!-- load the jQuery and require.js libraries -->
+    <!-- OF COURSE YOU NEED TO ADAPT NEXT LINE TO YOUR tiny_mce.js PATH -->
+
+    <!-- Initialize JS Plugins -->
+    <script src="javascripts/app.js"></script>
     <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>
     <script src="javascripts/app/angular.js"></script>
     <script type="text/javascript" src="javascripts/app/angular-resource.js"></script>
@@ -35,6 +45,9 @@
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/loader.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/scope.onready.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="javascripts/external/angular-http-auth.js"></script>
+    <script type="text/javascript" src="javascripts/external/directives/login.js"></script>
     <script src="underscore.js"></script>
 </head>
 <body ng-app="blogApp">
@@ -43,21 +56,32 @@
 <div class="row border-main gradient-main">
 
 
-    <div class="twelve columns ">
+    <div class="eight columns ">
         <div ng-controller="TitleCtrl">
             <h1 ng-bind="title">
                 <small><span ng-bind="subtitle">{{subtitle}} </span></small>
             </h1>
+
         </div>
-        <ul class="nav-bar">
-            <li><a href="#/">Blog</a></li>
-            <li><a href="#/about">About Me</a></li>
-            <li><a href="#/projects">Projects</a></li>
-            <li><a href="#/shoutouts">Shoutouts</a></li>
-        </ul>
 
 
     </div>
+    <div class="four columns">
+        <div ng-controller="UserInfoCtrl">
+            <p>{{userinfo.username}}</p>
+            <a href="#/logout" if-authed="show" class="button">logout</a>
+            <a href="#" if-authed="hide" class="button" data-reveal-id="myModal">Register</a>
+        </div>
+    </div>
+</div>
+<div class="row border-main gradient-main">
+    <ul class="nav-bar">
+        <li><a href="#/">Blog</a></li>
+        <li><a href="#/about">About Me</a></li>
+        <li><a href="#/projects">Projects</a></li>
+        <li><a href="#/shoutouts">Shoutouts</a></li>
+    </ul>
+
 </div>
 <div class="row border-main gradient-main">
     <!-- Main  Content -->
@@ -159,14 +183,27 @@
 
 -->
 
-<!-- Included JS Files (Compressed) -->
-<script src="javascripts/jquery.js"></script>
-<script src="javascripts/foundation.min.js"></script>
-<!-- load the jQuery and require.js libraries -->
-<!-- OF COURSE YOU NEED TO ADAPT NEXT LINE TO YOUR tiny_mce.js PATH -->
 
-<!-- Initialize JS Plugins -->
-<script src="javascripts/app.js"></script>
 
+
+<div ng-controller="RegisterCtrl">
+<div reveal-modal="reveal" id="myModal" class="reveal-modal [expand, xlarge, large, medium, small]">
+    <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>Username</th>
+            <td><input type="text" class="login-inp" ng-model="form.username"/></td>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <td><input type="password" class="login-inp" ng-model="form.password"/></td>
+        </tr>
+        <tr>
+            <th></th>
+            <td><a class="button" ng-click="submitRegi()">Submit</a></td>
+            <td><a class="close-reveal-modal button">Cancel</a> </td>
+        </tr>
+    </table>
+</div>
+</div>
 </body>
 </html>

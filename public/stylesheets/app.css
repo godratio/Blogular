@@ -17,7 +17,9 @@
     height: 300px;
     border: 2px solid #000000;
 }
-
+.comment{
+    border-top: 1px solid #000000;
+}
 .backgroundTitleImage{
     width: 300px;
     height: 300px;
@@ -34,6 +36,7 @@
 .footer-child{
     height: 200px;
 }
+
 .right-separator{
     border-right: 1px solid #0000ff;
 }

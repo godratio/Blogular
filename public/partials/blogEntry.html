@@ -3,8 +3,8 @@
 
         <article>
 
-            <h3><b>{{entry[0].title}}</b></h3>
-            <h6>Written by <a href="#">{{entry[0].author}}</a> on {{entry[0].date}}.</h6>
+            <h3><b>{{entry.title}}</b></h3>
+            <h6>Written by <a href="#">{{entry.author}}</a> on {{entry.date}}.</h6>
 
             <div class="row">
                 <div class="six columns">
@@ -17,6 +17,38 @@
             <hr />
             <br />
         </article>
+        <div login>
+            <div id="login-inner" ng-controller="LoginController">
 
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>Username</th>
+                        <td><input type="text" class="login-inp" ng-model="form.username"/></td>
+                    </tr>
+                    <tr>
+                        <th>Password</th>
+                        <td><input type="password" class="login-inp" ng-model="form.password"/></td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td><a class="button" ng-click="submitAuth()"></a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="comments" class="row">
+            <div class="six columns">
+                <div id="submitComment">
+                    <textarea ng-model="body"></textarea>
+                    <p>
+                        <a ng-click="submitComment()" class="button" resetOnSubmit="true"></a>
+                    </p>
+                </div>
+
+                <div class="comment" ng-repeat="comment in comments">
+                   <p>{{comment.body}}</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

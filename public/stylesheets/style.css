@@ -8,6 +8,7 @@ a {
 #blogList{
 
 }
+
 .waitingForAngularToLoad {
     background-image: url("/images/loading.gif");
     background-repeat: no-repeat;
