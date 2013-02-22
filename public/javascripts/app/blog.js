@@ -33,32 +33,72 @@ app.directive('becomeMainContent', function () {
 });
 app.directive('revealModal', function () {
     return {
-        link:function (scope, ele, attr) {
+        link:function (scope, elm, attrs) {
             console.log('show-modal directive called');
-            console.log(attr);
-            if(attr == 'reveal' ){
-            ele.reveal({
-                animationSpeed:"300"
+            console.log(attrs);
+
+
+            scope.$on('event:auth-loginConfirmed', function (event) {
+                console.log("EVENT TRIGGERED"+event);
+                if(attrs.revealModal == 'login'){
+                    elm.trigger('reveal:close');
+                }else{
+                    //elm.show();
+                }
             });
-            }
+
+
         }
     }
 });
 
 app.directive('ifAuthed',function($http){
     return {
-        link:function(scope,ele){
+        link:function(scope,elm,attrs){
             console.log('hideIfAuthedCalled');
-            //ele.hide();
-           // console.log(attr.ifAuthed);
-           // var param = attr.ifAuthed;
-            $http.get('/checkauthed').
-                success(function(data,status){
-                    ele.hide();
-                }).error(function(data,status){
-                //    console.log(param);
+            $http.post('/checkauthed').then(function(response){
+                if(attrs.ifAuthed == 'show'){
+                    elm.show();
+                }else{
                     elm.hide();
+                }
+            });
+            scope.$on('event:auth-loginConfirmed', function (event) {
+                console.log("EVENT TRIGGERED"+event);
+                if(attrs.ifAuthed == 'show'){
+                    elm.show();
+                }else{
+                    elm.hide();
+                }
+            });
+            scope.$on('event:auth-loggedOut',function(event){
+                console.log(event);
+                if(attrs.ifAuthed == 'show'){
+                    elm.hide();
+                }else{
+                    elm.show();
+                }
+            })
+
+            scope.$on('event:auth-loginRequired', function (event) {
+
+                if(attrs.ifAuthed == 'show'){
+                    elm.hide();
+                }else{
+                    elm.show();
+                }
+            });
+
+                /*
+                .success(function(){
+                    console.log("success");
                 })
+                .error(function(){
+                    console.log("fail");
+                });
+                */
+
+
         }
     }
 })
@@ -102,7 +142,7 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
                 $scope.entry = blog[0];
                 $scope.text = blog[0].text;
                 $scope.comments = blog[0].comments;
-                $scope.$onReady("success");
+                $scope.$onReady("commentsupdated");
             },
             function () {
                 $scope.$onFailure("failed");
@@ -159,12 +199,14 @@ app.controller('LoginController', function ($scope, $http, authService, authServ
                 .success(function (data, status) {
                     console.log(data);
                     userInfoService.setUsername($scope.form.username);
-                    $scope.form = [];
+                    $scope.form.username = "";
+                    $scope.form.password = "";
                     authService.loginConfirmed();
                 }).error(function (data, status) {
 
                 });
         }
+
     }
 );
 
@@ -173,7 +215,7 @@ app.controller('RegisterCtrl', function ($scope, $http) {
         $http.post('/register', $scope.form).
             success(function (data, status) {
                 console.log(data);
-                $scope.form = [];
+                $scope.form = {};
             }).
             error(function (data, status) {
 
@@ -181,7 +223,20 @@ app.controller('RegisterCtrl', function ($scope, $http) {
     }
 });
 
-app.controller('UserInfoCtrl',function($scope,userInfoService){
+app.controller('UserInfoCtrl',function($scope,userInfoService,$http){
     //TODO: Why is $scope.userinfo.username undefined userinfo???WTF
     $scope.userinfo = userInfoService.getUsername();
+    $scope.logout = function(){
+        console.log("Why u call logout");
+        $http.get('/logout').
+            success(function(){
+                userInfoService.setUsername('Guest');
+            }).error(function(){
+                console.log("error on logour??")
+            })
+    }
+    $scope.$on('event:auth-loggedOut',function(event){
+        userInfoService.setUsername("Guest");
+    })
+
 })

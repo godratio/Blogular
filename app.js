@@ -212,6 +212,9 @@ app.get('/lastUpdateSame',function(req,res){
 app.get('/checkauthed',ensureAuthenticated,function(req,res){
     return res.send("authed",200);
 });
+app.post('/checkauthed',ensureAuthenticated,function(req,res){
+    return res.send("authed",200);
+});
 app.get('/lastUpdateSame/:date', function (req, res) {
     var dateFromClient = req.params.date;
     var response = [];
@@ -241,7 +244,7 @@ app.post('/login',
     });
 app.get('/logout', function(req, res){
     req.logout();
-    res.send('loggedout',200);
+    res.send('Gone',410 );
 });
 app.post('/auth/login', function (req, res) {
     /*

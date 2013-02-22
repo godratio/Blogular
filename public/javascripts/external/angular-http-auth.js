@@ -65,6 +65,13 @@ angular.module('http-auth-interceptor', [])
           $rootScope.$broadcast('event:auth-loginRequired');
           return deferred.promise;
         }
+        if(response.status == 410){
+            var deferred = $q.defer();
+//            authServiceProvider.pushToBuffer(response.config, deferred);
+            $rootScope.$broadcast('event:auth-loggedOut');
+            return deferred.promise;
+
+        }
         // otherwise
         return $q.reject(response);
       }
