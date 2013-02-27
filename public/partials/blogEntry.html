@@ -46,7 +46,13 @@
                 </div>
 
                 <div class="comment" ng-repeat="comment in comments">
+                    <p><b>{{comment.username}}</b></p>
                    <p>{{comment.body}}</p>
+                </div>
+            </div>
+            <div class="six columns">
+                <div ng-repeat="viewer in viewers">
+                    <p>{{viewer.username}}</p>
                 </div>
             </div>
         </div>

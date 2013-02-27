@@ -6,8 +6,11 @@ var express = require('express')
     , mongoose = require('mongoose')
     , fs = require('fs')
     , passport = require('passport')
-    , LocalStrategy = require('passport-local').Strategy;
-
+    , LocalStrategy = require('passport-local').Strategy
+    ,cookie = require('cookie')
+    ,passportSocketIo = require("passport.socketio")
+    ,MemoryStore = express.session.MemoryStore
+    ,sessionStore = new MemoryStore();
 //var MemoryStore = require('connect/middleware/session/memory');
 mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
@@ -22,7 +25,7 @@ var blogSchema = mongoose.Schema({
     author:String,
     text:String,
     comments:[
-        { body:String, date:Date }
+        { body:String, date:Date ,username:String }
     ],
     date:{ type:Date, default:Date.now },
     hidden:Boolean,
@@ -63,8 +66,8 @@ app.configure(function () {
     app.use(express.logger('dev'));
     app.use(express.bodyParser());
     app.use(express.methodOverride());
-    app.use(express.cookieParser('your secret here'));
-    app.use(express.session({ secret: 'keyboard cat' }));
+    app.use(express.cookieParser('secret'));
+    app.use(express.session({store:sessionStore,secret:'secret',key:'express.sid'}));
     // Initialize Passport! Also use passport.session() middleware, to support
     // persistent login sessions (recommended).
     app.use(passport.initialize());
@@ -272,10 +275,12 @@ app.post('/auth/login', function (req, res) {
 
 app.post('/blog', restrict, function (req, res) {
     //console.log(req.session.loggedIn);
-    console.log(req.body);
+    //console.log(req.body);
+    console.log("blog route");
     var title = req.body.title;
     if (title === '' || title === null || title === undefined)return res.send('need a title', 404);
     else {
+
         var newBlogEntry = new Blog(req.body);
         newBlogEntry.save(function (err, newBlogEntry) {
             if (err)console.log(err);
@@ -286,14 +291,23 @@ app.post('/blog', restrict, function (req, res) {
 //temp removing restrictions for testing purposes TODO:reinstate restrictions
 app.post('/blog/:id',ensureAuthenticated, function (req, res) {
     delete req.body._id;
-    Blog.findOneAndUpdate({'_id':req.params.id}, req.body, function (err, doc) {
-        if (err){
-            console.log(err);
-            res.end(JSON.stringify({result:'error'}));
-        }
-        console.log(doc);
-        res.end(JSON.stringify(doc));
+    User.findOne({_id:req.session.passport.user},function(err,user){
+        loggedInUser = user;
+        console.log(loggedInUser);
+        Blog.findOneAndUpdate({'_id':req.params.id}, req.body, function (err, doc) {
+            if (err){
+                console.log(err);
+                res.end(JSON.stringify({result:'error'}));
+            }
+           doc.comments[doc.comments.length-1].username = user.username;
+            console.log(doc);
+            doc.save(function(err,doc){
+                if(err)console.log(err);
+            });
+            res.end(JSON.stringify(doc));
+        });
     });
+
 });
 
 app.post('/register',function(req,res){
@@ -348,16 +362,112 @@ var server = http.createServer(app).listen(app.get('port'),function(){
 });
 var io = require('socket.io').listen(server);
 
-
 //************SOCKETS.IO**************************//
+
+io.configure(function (){
+    io.set("authorization", passportSocketIo.authorize({
+        key:    'express.sid',       //the cookie where express (or connect) stores its session id.
+        secret: 'secret', //the session secret to parse the cookie
+        store:   sessionStore,     //the session store that express uses
+        fail: function(data, accept) {
+            // console.log("failed");
+            // console.log(data);// *optional* callbacks on success or fail
+            accept(null, false);             // second param takes boolean on whether or not to allow handshake
+        },
+        success: function(data, accept) {
+          //  console.log("success socket.io auth");
+         //   console.log(data);
+            accept(null, true);
+        }
+    }));
+    /*
+    io.set('authorization', function (data, accept) {
+        if (data.headers.cookie) {
+            data.cookie = cookie.parse(data.headers.cookie);
+            console.log(data.cookie);
+            data.sessionID = data.cookie['express.sid'];
+            console.log(data.sessionID);
+            // save the session store to the data object
+            // (as required by the Session constructor)
+            data.sessionStore = sessionStore;
+            sessionStore.get(data.sessionID, function (err, session) {
+                console.log(session);
+                if (err || !session) {
+                    accept('Error with getting session from store', false);
+                } else {
+                    // create a session object, passing data as request and our
+                    // just acquired session data
+                    console.log("found in store");
+                    data.session = new Session(data, session);
+                    accept(null, true);
+                }
+            });
+        } else {
+            return accept('No cookie transmitted.', false);
+        }
+       // console.log('socketio authorization called');
+       // callback(null, true); // error first callback style
+    });
+    */
+});
+var rooms = [];
+
 io.sockets.on('connection' , function(socket){
     socket.emit('connected',{conn:'true'});
     socket.on('subscribe',function(data){
+        console.log('subscribed');
         console.log(data);
+        console.log(socket.handshake.user);
         socket.join(data.room);
+        rooms.push({room:data.room,user:[]})
+        passportSocketIo.filterSocketsByUser(io, function (user) {
+            console.log(user);
+            return user[0]._id === socket.handshake.user[0]._id;
+        }).forEach(function(s){
+                console.log("for each");
+                socket.broadcast.in(data.room).emit('updateusers',{username:socket.handshake.user[0].username,id:socket.handshake.user[0]._id});
+            });
+
     });
     socket.on('sentcomment',function(data){
         socket.broadcast.emit('commentsupdated','',"updateNow");
+    });
+    socket.on('unsubscribe', function(){
+        // remove the username from global usernames list
+        //delete usernames[socket.username];
+        // update list of users in chat, client-side
+        //io.sockets.emit('updateusers', usernames);
+        // echo globally that this client has left
+        console.log('unsubscribe');
+        console.log(socket.handshake.user);
+        passportSocketIo.filterSocketsByUser(io, function (user) {
+            console.log(user);
+            return user[0]._id === socket.handshake.user[0]._id;
+        }).forEach(function(s){
+                console.log("for each rem");
+
+                socket.leave(socket.room);
+                socket.broadcast.to(socket.room).emit('removeuser',socket.handshake.user[0]._id);
+            });
+
+    });
+    socket.on('disconnect', function(){
+        // remove the username from global usernames list
+        //delete usernames[socket.username];
+        // update list of users in chat, client-side
+        //io.sockets.emit('updateusers', usernames);
+        // echo globally that this client has left
+        console.log('disconnect');
+        passportSocketIo.filterSocketsByUser(io, function (user) {
+            console.log(user);
+            return user[0]._id === socket.handshake.user[0]._id;
+        }).forEach(function(s){
+                console.log("for each rem");
+
+                socket.leave(socket.room);
+                socket.broadcast.to(socket.room).emit('removeuser',socket.handshake.user[0]._id);
+            });
+
     });
 });
 //io.sockets.in('room').emit('event_name',data);

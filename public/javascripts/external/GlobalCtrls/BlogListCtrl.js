@@ -5,12 +5,13 @@
  * Time: 0:45
  * To change this template use File | Settings | File Templates.
  */
-angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService', 'Scope.onReady'])
-    .controller('ContentCtrl', function ($scope, show, Blog, BlogsService, $q, $routeParams, UpdateService) {
+angular.module('Plugin.Controller.BlogEntries', ['updateService',  'socketio','blogService', 'Scope.onReady'])
+    .controller('ContentCtrl', function ($scope, show, Blog, BlogsService, $q, $routeParams, UpdateService,socket) {
         console.log($routeParams.name + "parname");
         var filterByTags = function () {
 
         }
+        socket.emit('unsubscribe');
         $scope.$prepareForReady();
         $scope.filterTag = $routeParams.name;
         //check if user wants to see blogs by categories or not

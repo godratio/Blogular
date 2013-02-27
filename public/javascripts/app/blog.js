@@ -101,7 +101,7 @@ app.directive('ifAuthed',function($http){
 
         }
     }
-})
+});
 app.factory('show', function () {
     return {state:false};
 });
@@ -136,6 +136,7 @@ var AboutCtrl = function ($scope, $http) {
 
 app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, socket, BlogsService) {
     $scope.entry = "";
+    $scope.viewers = [];
     socket.emit('subscribe', {room:$routeParams.id});
     socket.on('commentsupdated', function (data) {
         Blog.get({id:$routeParams.id}, function (blog) {
@@ -148,6 +149,21 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
                 $scope.$onFailure("failed");
             });
     });
+    socket.on('updateusers',function(data){
+        console.log('updated user list');
+        console.log(data);
+        $scope.viewers.push(data);
+    });
+    socket.on('removeuser',function(data){
+        var viewers = [];
+        angular.copy($scope.viewers,viewers);
+        angular.forEach($scope.viewers,function(value,key){
+           console.log(value);
+            if(value.id == data){
+                $scope.viewers.splice(key,1);
+            }
+        });
+    })
     $scope.submitComment = function () {
         /*
          BlogsService.postComment({body:$scope.body,id:$scope.entry._id},function(blog){
@@ -182,6 +198,7 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     Blog.get({id:$routeParams.id}, function (blog) {
             $scope.entry = blog[0];
             $scope.text = blog[0].text;
+            console.log(blog[0].comments);
             $scope.comments = blog[0].comments;
             $scope.$onReady("success");
         },
@@ -207,8 +224,7 @@ app.controller('LoginController', function ($scope, $http, authService, authServ
                 });
         }
 
-    }
-);
+    });
 
 app.controller('RegisterCtrl', function ($scope, $http) {
     $scope.submitRegi = function () {
