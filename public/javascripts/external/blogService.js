@@ -206,7 +206,7 @@ angular.module('foundationjs',[]).
 
 angular.module('socketio',[]).
     factory('socket',function($rootScope){
-        var socket = io.connect('http://localhost:3000',{
+        var socket = io.connect('',{
 
             'reconnect':                 true,
             'reconnection delay':        500,
