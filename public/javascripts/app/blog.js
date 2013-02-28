@@ -135,9 +135,18 @@ var AboutCtrl = function ($scope, $http) {
 }
 
 app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, socket, BlogsService) {
+    socket.connect();
     $scope.entry = "";
     $scope.viewers = [];
+    console.log("angular subscribing");
     socket.emit('subscribe', {room:$routeParams.id});
+    socket.on('initialuserlist',function(data){
+        console.log('initialize user list');
+        console.log(data);
+        $scope.viewers = data;
+    })
+
+
     socket.on('commentsupdated', function (data) {
         Blog.get({id:$routeParams.id}, function (blog) {
                 $scope.entry = blog[0];
@@ -152,7 +161,7 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     socket.on('updateusers',function(data){
         console.log('updated user list');
         console.log(data);
-        $scope.viewers.push(data);
+        $scope.viewers = data;
     });
     socket.on('removeuser',function(data){
         var viewers = [];
@@ -188,7 +197,7 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
             $scope.comments = blog.comments;
             $scope.body = "";
 //            $scope.comments = BlogsService.getCommentsForBlogEntry($routeParams.id);
-            socket.emit('sentcomment', {update:'true'});
+            socket.emit('sentcomment', {room:$routeParams.id});
         });
 
     };
@@ -196,6 +205,7 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     $scope.show = show;
     $scope.$prepareForReady();
     Blog.get({id:$routeParams.id}, function (blog) {
+            console.log("got blogs");
             $scope.entry = blog[0];
             $scope.text = blog[0].text;
             console.log(blog[0].comments);
@@ -205,10 +215,23 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
         function () {
             $scope.$onFailure("failed");
         });
-
+    $scope.$on('$routeChangeStart', function(scope, next, current){
+        console.log('Changing from '+angular.toJson(current)+' to '+angular.toJson(next));
+        console.log($routeParams.id);
+        socket.emit('unsubscribe',{room:$routeParams.id});
+    });
+    $scope.$on('$destroy', function (event) {
+        console.log("Being destroyed");
+        socket.removeListener('enterroom');
+        socket.removeAllListeners('initialuserlist');
+        socket.removeAllListeners('commentsupdated');
+        socket.removeAllListeners('updateusers');
+        // or something like
+        // socket.removeListener(this);
+    });
 });
 
-app.controller('LoginController', function ($scope, $http, authService, authService,userInfoService) {
+app.controller('LoginController', function ($scope, $http, authService, authService,userInfoService,socket) {
 
         $scope.submitAuth = function () {
             console.log($scope.form);
@@ -218,6 +241,7 @@ app.controller('LoginController', function ($scope, $http, authService, authServ
                     userInfoService.setUsername($scope.form.username);
                     $scope.form.username = "";
                     $scope.form.password = "";
+                    socket.connect();
                     authService.loginConfirmed();
                 }).error(function (data, status) {
 
@@ -239,20 +263,21 @@ app.controller('RegisterCtrl', function ($scope, $http) {
     }
 });
 
-app.controller('UserInfoCtrl',function($scope,userInfoService,$http){
+app.controller('UserInfoCtrl',function($scope,userInfoService,$http,socket){
     //TODO: Why is $scope.userinfo.username undefined userinfo???WTF
     $scope.userinfo = userInfoService.getUsername();
     $scope.logout = function(){
         console.log("Why u call logout");
         $http.get('/logout').
             success(function(){
-                userInfoService.setUsername('Guest');
+
             }).error(function(){
                 console.log("error on logour??")
             })
     }
     $scope.$on('event:auth-loggedOut',function(event){
         userInfoService.setUsername("Guest");
+        socket.disconnect();
     })
 
 })

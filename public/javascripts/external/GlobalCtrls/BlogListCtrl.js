@@ -11,7 +11,6 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService',  'socketio','b
         var filterByTags = function () {
 
         }
-        socket.emit('unsubscribe');
         $scope.$prepareForReady();
         $scope.filterTag = $routeParams.name;
         //check if user wants to see blogs by categories or not

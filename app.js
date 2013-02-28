@@ -240,15 +240,19 @@ app.get('/lastUpdateSame/:date', function (req, res) {
     });
 
 });
+app.get('/logout', function(req, res){
+    console.log("try to logout");
+    req.logout();
+    res.send('loggedout',410);
+//  req.logout();
+//  res.send('Gone',410 );
+});
 app.post('/login',
     passport.authenticate('local'),
     function(req, res) {
         res.send('authed',200);
     });
-app.get('/logout', function(req, res){
-    req.logout();
-    res.send('Gone',410 );
-});
+
 app.post('/auth/login', function (req, res) {
     /*
      var userEntry = new Admin({username:'ray',password:'abc'});
@@ -410,45 +414,163 @@ io.configure(function (){
     });
     */
 });
-var rooms = [];
+var connectedusers = [];
+var clients = [];
+/*
+io.sockets.on('connection',function(socket){
+    console.log("connection with socket");
+    socket.on('subscribe',function(data){
+        //socket.join('testroom');
+        var duplicateUserForRoom = false;
+        var usersForThisRoom = [];
+        var duplicateUser = false;
+        var roomToEnter = data.room;
+        roomToEnter = 'testroom';
+        for(var i = 0;i<connectedusers.length;i++){
+            if(connectedusers[i].room == roomToEnter){
+                usersForThisRoom.push(connectedusers[i]);
+            }
+            //if user already subscribed to this room do nothing
+            if(connectedusers[i].id == socket.handshake.user[0]._id && connectedusers[i].room == roomToEnter){
+                console.log("duplicate user for this room");
+                duplicateUserForRoom = true;
+                socket.emit('enterroom',"You are already subscribed");
+            }else{
+                if(connectedusers[i].id == socket.handshake.user[0]._id){
+                    duplicateUser = true;
+                }
+            }
+        }
+
+        if(duplicateUserForRoom == false){
+            console.log("add connecteduser");
+            connectedusers.push({room:roomToEnter,id:socket.handshake.user[0]._id,username:socket.handshake.user[0].username,socketid:socket.id});
+        }
+        if(duplicateUser == false && duplicateUserForRoom == false){
+            console.log("add client");
+            clients[socket.id] = socket;
+        }
+        for(var i = 0;i<connectedusers.length;i++){
+            if(connectedusers[i].room == roomToEnter){
+                console.log('roomtoenter');
+                console.log('sent to ',connectedusers[i].username);
+                clients[connectedusers[i].socketid].emit('enterroom','Hey '+connectedusers[i].username+' has entered test room');
+            }
+
+        }
+        socket.emit("enterroom","You have entered test room");
+    });
+
+    socket.on('unsubscribe',function(data){
+        var duplicateUserForRoom = false;
+        var usersForThisRoom = [];
+        var duplicateUser = false;
+        var roomToEnter = data.room;
+        roomToEnter = 'testroom';
+        for(var i = 0;i<connectedusers.length;i++){
+            if(connectedusers[i].room == roomToEnter){
+                usersForThisRoom.push(connectedusers[i]);
+            }
+            //if user already subscribed to this room do nothing
+            if(connectedusers[i].id == socket.handshake.user[0]._id && connectedusers[i].room == roomToEnter){
+                console.log("remove user for this room");
+                duplicateUserForRoom = true;
+                //not making a deep copy
+                connectedusers.splice(i,1);
+                socket.emit('enterroom',"you have been removed");
+            }else{
+                if(connectedusers[i].id == socket.handshake.user[0]._id){
+                    duplicateUser = true;
+                }
+            }
+        }
+        for(var i = 0;i<connectedusers.length;i++){
+            if(connectedusers[i].room == roomToEnter){
+                console.log('roomtoenter');
+                console.log('sent to ',connectedusers[i].username);
+                clients[connectedusers[i].socketid].emit('enterroom','Hey '+connectedusers[i].username+' has left test room');
+            }
+
+        }
+        socket.emit('enterroom','you have left the room');
+
+    })
+})
+*/
 
 io.sockets.on('connection' , function(socket){
     socket.emit('connected',{conn:'true'});
     socket.on('subscribe',function(data){
         console.log('subscribed');
-        console.log(data);
-        console.log(socket.handshake.user);
-        socket.join(data.room);
-        rooms.push({room:data.room,user:[]})
-        passportSocketIo.filterSocketsByUser(io, function (user) {
-            console.log(user);
-            return user[0]._id === socket.handshake.user[0]._id;
-        }).forEach(function(s){
-                console.log("for each");
-                socket.broadcast.in(data.room).emit('updateusers',{username:socket.handshake.user[0].username,id:socket.handshake.user[0]._id});
-            });
+
+            socket.handshake.room = data.room;
+                var duplicateUserForRoom = false;
+                var buffer = connectedusers;
+                var usersForThisRoom = [];
+//        console.log(connectedusers.length)
+                for(var i = 0;i<connectedusers.length;i++){
+
+                    if(connectedusers[i].id == socket.handshake.user[0]._id && connectedusers[i].room == data.room){
+                       // duplicateUserForRoom = true;
+                    }
+                    if(connectedusers[i].room == data.room){
+                        usersForThisRoom.push(connectedusers[i]);
+                    }
+                }
+        var clients = io.sockets.clients(data.room);
+        for(var i = 0;i<clients.length;i++){
+            console.log("================================================================next client loading....");
+            console.log(clients[i]);
+        }
+                if(duplicateUserForRoom == false){
+                    socket.join(data.room);
+                    connectedusers.push({room:data.room,id:socket.handshake.user[0]._id,username:socket.handshake.user[0].username});
+
+                        usersForThisRoom.push({room:data.room,id:socket.handshake.user[0]._id,username:socket.handshake.user[0].username});
+
+
+                     socket.emit('initialuserlist',usersForThisRoom);
+                     socket.broadcast.in(data.room).emit('updateusers',usersForThisRoom);
+                }
+
 
     });
     socket.on('sentcomment',function(data){
-        socket.broadcast.emit('commentsupdated','',"updateNow");
+        socket.broadcast.in(data.room).emit('commentsupdated','',"updateNow");
     });
-    socket.on('unsubscribe', function(){
+    socket.on('unsubscribe', function(data){
         // remove the username from global usernames list
         //delete usernames[socket.username];
         // update list of users in chat, client-side
         //io.sockets.emit('updateusers', usernames);
         // echo globally that this client has left
         console.log('unsubscribe');
-        console.log(socket.handshake.user);
-        passportSocketIo.filterSocketsByUser(io, function (user) {
-            console.log(user);
-            return user[0]._id === socket.handshake.user[0]._id;
-        }).forEach(function(s){
-                console.log("for each rem");
+        socket.leave(data.room);
+        var usersForThisRoom = [];
 
-                socket.leave(socket.room);
-                socket.broadcast.to(socket.room).emit('removeuser',socket.handshake.user[0]._id);
-            });
+
+                var buffer = connectedusers;
+                for(var i = 0;i<connectedusers.length;i++){
+
+                    if(connectedusers[i].id == socket.handshake.user[0]._id){
+                        buffer.splice(i,1);
+                    }
+                    if(connectedusers[i] != undefined && connectedusers[i].room == data.room){
+                        usersForThisRoom.push(connectedusers[i]);
+                    }
+
+                }
+                connectedusers = buffer;
+        console.log(io.sockets.manager.rooms);
+       var clients = io.sockets.clients(data.room)
+       for(var i = 0;i<clients.length;i++){
+           console.log("================================================================next client loading....");
+           console.log(clients[i]);
+
+
+       }
+        //socket.broadcast.to(socket.room).emit('removeuser',socket.handshake.user[0]._id);
+        socket.broadcast.to(data.room).emit('updateusers',usersForThisRoom);
 
     });
     socket.on('disconnect', function(){
@@ -457,17 +579,27 @@ io.sockets.on('connection' , function(socket){
         // update list of users in chat, client-side
         //io.sockets.emit('updateusers', usernames);
         // echo globally that this client has left
+        socket.leave(socket.room);
+        var usersForThisRoom = [];
         console.log('disconnect');
-        passportSocketIo.filterSocketsByUser(io, function (user) {
-            console.log(user);
-            return user[0]._id === socket.handshake.user[0]._id;
-        }).forEach(function(s){
-                console.log("for each rem");
 
-                socket.leave(socket.room);
-                socket.broadcast.to(socket.room).emit('removeuser',socket.handshake.user[0]._id);
-            });
+        var buffer = connectedusers;
+        for(var i = 0;i<connectedusers.length;i++){
 
+            if(connectedusers[i].id == socket.handshake.user[0]._id){
+                buffer.splice(i,1);
+            }
+            if(connectedusers[i] != undefined && connectedusers[i].room == socket.room){
+                usersForThisRoom.push(connectedusers[i]);
+            }
+
+        }
+        connectedusers = buffer;
+
+
+        console.log(socket.handshake.user[0].username);
+        console.log(socket.handshake);
+        socket.broadcast.to(socket.room).emit('updateusers',usersForThisRoom);
     });
 });
 //io.sockets.in('room').emit('event_name',data);

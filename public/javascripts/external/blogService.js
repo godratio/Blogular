@@ -206,8 +206,31 @@ angular.module('foundationjs',[]).
 
 angular.module('socketio',[]).
     factory('socket',function($rootScope){
-        var socket = io.connect();
+        var socket = io.connect('http://localhost:3000',{
+
+            'reconnect':                 true,
+            'reconnection delay':        500,
+            'reopen delay':              3000,
+            'max reconnection attempts': 10,
+            'auto connect':              false
+
+        });
+        console.log("connecting");
         return {
+            connect:function(){
+                console.log(io);
+                console.log(socket.socket.connected);
+                if(socket.socket.connected == false){
+                    console.log("calling connect");
+                    socket.socket.connect();
+                }
+                //socket.socket.disconnectSync();
+            },
+            reconnect:function(){
+                console.log('func socket_reconnect');
+                socket.socket.reconnect();
+                console.log('atttempted to connect');
+            },
             on:function(eventName,callback){
                 socket.on(eventName,function(){
                     var args = arguments;
@@ -225,6 +248,16 @@ angular.module('socketio',[]).
                         }
                     });
                 });
+            },
+            removeListener:function(eventName,data){
+                console.log("removing listener"+eventName);
+                socket.removeListener(eventName,data);
+            },
+            removeAllListeners:function(eventName){
+                socket.removeAllListeners(eventName);
+            },
+            disconnect:function(){
+                socket.disconnect();
             }
         }
     });
