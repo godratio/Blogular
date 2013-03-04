@@ -9,9 +9,9 @@ var blogResource = angular.module('blogResource', ['ngResource']).
         );
     });
 
-angular.module('blogService',['ngResource']).
-    factory('BlogsService',function($resource,$q,$rootScope){
-        var blogResource =  $resource('/blog/:id',
+angular.module('blogService', ['ngResource']).
+    factory('BlogsService', function ($resource, $q, $rootScope) {
+        var blogResource = $resource('/blog/:id',
             {id:'@_id'},
             {
                 'get':{method:'GET', isArray:'true'},
@@ -21,39 +21,39 @@ angular.module('blogService',['ngResource']).
         var commentResource = $resource('/comments',
             {id:'@_id'},
             {
-                'get':{method:'GET',isArray:'true'},
+                'get':{method:'GET', isArray:'true'},
                 'save':{method:'POST'}
             }
         );
         var categories = [];
         var allBlogs = [];
-        var BlogsService ={
-            getBlogs:function(callback){
+        var BlogsService = {
+            getBlogs:function (callback) {
                 var deferred = $q.defer();
                 console.log("the errori shere ??");
-                blogResource.get(function(blogs){
+                blogResource.get(function (blogs) {
                         console.log("errorbeforcallback");
-                       categories.length = 0;
-                        for(var i = 0;i<blogs.length;i++){
-                            for(var x = 0;x<blogs[i].categories.length;x++){
+                        categories.length = 0;
+                        for (var i = 0; i < blogs.length; i++) {
+                            for (var x = 0; x < blogs[i].categories.length; x++) {
                                 var name = blogs[i].categories[x].name;
                                 var added = false;
-                                if(categories.length == 0){
-                                    categories.push({name:name,count:1});
+                                if (categories.length == 0) {
+                                    categories.push({name:name, count:1});
                                     added = true;
                                 }
-                                if(added == false){
-                                    for(var y = 0;y<categories.length;y++){
+                                if (added == false) {
+                                    for (var y = 0; y < categories.length; y++) {
                                         var buffername = categories[y].name;
                                         var buffercount = categories[y].count;
-                                        if(buffername == name){
-                                            categories[y].count = ++buffercount ;
+                                        if (buffername == name) {
+                                            categories[y].count = ++buffercount;
                                             added = true;
                                         }
                                     }
                                 }
-                                if(added == false){
-                                    categories.push({name:name,count:1});
+                                if (added == false) {
+                                    categories.push({name:name, count:1});
                                 }
                             }
                         }
@@ -61,36 +61,36 @@ angular.module('blogService',['ngResource']).
 
                         callback(blogs);
                     },
-                    function(){
+                    function () {
                     });
             },
-            getCategories:function(){
+            getCategories:function () {
                 return categories;
             },
-            getAllBlogs:function(callback){
-                if(allBlogs.length > 0){
-                   // console.log(callback);
-                    if(typeof callback == 'function'){
+            getAllBlogs:function (callback) {
+                if (allBlogs.length > 0) {
+                    // console.log(callback);
+                    if (typeof callback == 'function') {
                         callback(allBlogs);
                     }
                     //return allBlogs;
-                }else{
-                    this.getBlogs(function(blogs){
+                } else {
+                    this.getBlogs(function (blogs) {
 
                         callback(blogs);
                     })
                 }
                 //return allBlogs;
             },
-            getBlogsByTag:function(tag){
+            getBlogsByTag:function (tag) {
 
                 var buffer = [];
-                angular.copy(allBlogs,buffer);
-                for(var x = 0;x< allBlogs.length;x++){
-                   //console.log(buffer[x].categories);
-                    for(var i = 0;i<allBlogs[x].categories.length;i++){
+                angular.copy(allBlogs, buffer);
+                for (var x = 0; x < allBlogs.length; x++) {
+                    //console.log(buffer[x].categories);
+                    for (var i = 0; i < allBlogs[x].categories.length; i++) {
                         console.log(allBlogs[x].categories[i]);
-                        if(allBlogs[x].categories[i].name === tag){
+                        if (allBlogs[x].categories[i].name === tag) {
                             buffer.push(allBlogs[x]);
                         }
                     }
@@ -98,45 +98,45 @@ angular.module('blogService',['ngResource']).
                 }
                 return buffer;
             },
-            getCommentsForBlogEntry:function(id){
+            getCommentsForBlogEntry:function (id) {
                 //console.log(allBlogs);
                 for (var i = 0; i < allBlogs.length; i++) {
-                   // console.log("blogid = "+allBlogs[i]._id + " id = "+id);
-                    if(allBlogs[i]._id == id){
-                       // console.log(allBlogs[i]);
+                    // console.log("blogid = "+allBlogs[i]._id + " id = "+id);
+                    if (allBlogs[i]._id == id) {
+                        // console.log(allBlogs[i]);
                         return allBlogs[i].comments;
                     }
                 }
             }
             /*,TODO:why won allBlogs be the current value of comments ????
 
-            postComment:function(params,callback){
-               console.log(this.getCommentsForBlogEntry(params.id));
-                var buffer = [];
-                angular.copy(this.getCommentsForBlogEntry(params.id),buffer);
-                console.log(buffer);
-                buffer.push({body:params.body,date:Date.now()});
-                this.getAllBlogs(function(blogs){
-                    angular.forEach(blogs,function(value,key){
+             postComment:function(params,callback){
+             console.log(this.getCommentsForBlogEntry(params.id));
+             var buffer = [];
+             angular.copy(this.getCommentsForBlogEntry(params.id),buffer);
+             console.log(buffer);
+             buffer.push({body:params.body,date:Date.now()});
+             this.getAllBlogs(function(blogs){
+             angular.forEach(blogs,function(value,key){
 
-                        if(value._id == params.id){
+             if(value._id == params.id){
 
-                            allBlogs[key].comments = buffer;
-                            allBlogs[key].$save(function(newBlog){
-                                callback(newBlog);
-                            });
-                        }
-                    })
-                })
-            }
-            */
+             allBlogs[key].comments = buffer;
+             allBlogs[key].$save(function(newBlog){
+             callback(newBlog);
+             });
+             }
+             })
+             })
+             }
+             */
         }
         return BlogsService;
     });
 
-angular.module('updateService',['ngResource']).
-    factory('UpdateService',function($resource,$q){
-        var service =  $resource('/lastUpdateSame/:date',
+angular.module('updateService', ['ngResource']).
+    factory('UpdateService', function ($resource, $q) {
+        var service = $resource('/lastUpdateSame/:date',
             {date:''},
             {
                 'get':{method:'GET', isArray:'true'},
@@ -145,20 +145,20 @@ angular.module('updateService',['ngResource']).
         );
         var lastUpdate = {};
         //update last update variable upon first initialization of factory
-        (function(){
-            service.get(function(date){
+        (function () {
+            service.get(function (date) {
                 this.lastUpdate = date[0].lastUpdate;
             });
         }());
         var UpdateService = {
-            checkIfUpdate : function(callback){
+            checkIfUpdate:function (callback) {
 
-                service.get({date:lastUpdate.lastUpdate}, function(result){
+                service.get({date:lastUpdate.lastUpdate}, function (result) {
                     var resultToReturn;
-                    if(result[0].result == "true"){
+                    if (result[0].result == "true") {
                         lastUpdate = result[0].lastUpdate;
                         resultToReturn = true;
-                    }else{
+                    } else {
                         resultToReturn = false;
                     }
                     callback(resultToReturn);
@@ -168,25 +168,25 @@ angular.module('updateService',['ngResource']).
         }
         return UpdateService;
     })
-angular.module('blogFilter',[]).
-    filter('byTag',function(){
-       return function(blogs,tag){
-           if(blogs == undefined && tag == undefined){
-               return;
-           }else if(blogs != undefined && tag == undefined){
-               return blogs;
-           }else if(blogs != undefined && tag != undefined){
-               var buffer = [];
-               for(var x = 0;x< blogs.length;x++){
-                   for(var i = 0;i<blogs[x].categories.length;i++){
-                       if(blogs[x].categories[i].name === tag){
-                           buffer.push(blogs[x]);
-                       }
-                   }
-               }
-               return buffer;
-           }
-       }
+angular.module('blogFilter', []).
+    filter('byTag', function () {
+        return function (blogs, tag) {
+            if (blogs == undefined && tag == undefined) {
+                return;
+            } else if (blogs != undefined && tag == undefined) {
+                return blogs;
+            } else if (blogs != undefined && tag != undefined) {
+                var buffer = [];
+                for (var x = 0; x < blogs.length; x++) {
+                    for (var i = 0; i < blogs[x].categories.length; i++) {
+                        if (blogs[x].categories[i].name === tag) {
+                            buffer.push(blogs[x]);
+                        }
+                    }
+                }
+                return buffer;
+            }
+        }
     });
 var adminResource = angular.module('adminResource', ['ngResource']).
     factory('Admin', function ($resource) {
@@ -198,73 +198,72 @@ var adminResource = angular.module('adminResource', ['ngResource']).
             }
         );
     });
-angular.module('foundationjs',[]).
-    factory('foundation',function($rootScope){
+angular.module('foundationjs', []).
+    factory('foundation', function ($rootScope) {
 
 
     })
 
-angular.module('socketio',[]).
-    factory('socket',function($rootScope){
-        var socket = io.connect('',{
+angular.module('socketio', []).
+    factory('socket', function ($rootScope) {
+        var socket = io.connect('', {
 
-            'reconnect':                 true,
-            'reconnection delay':        500,
-            'reopen delay':              3000,
-            'max reconnection attempts': 10,
-            'auto connect':              false
+            'reconnect':true,
+            'reconnection delay':500,
+            'reopen delay':3000,
+            'max reconnection attempts':10
 
         });
         console.log("connecting");
         return {
-            connect:function(){
-                console.log(io);
-                console.log(socket.socket.connected);
-                if(socket.socket.connected == false){
-                    console.log("calling connect");
-                    socket.socket.connect();
-                }
-                //socket.socket.disconnectSync();
+            connect:function () {
+                var socket = io.connect('', {
+
+                    'reconnect':true,
+                    'reconnection delay':500,
+                    'reopen delay':3000,
+                    'max reconnection attempts':10
+                });
+
             },
-            reconnect:function(){
-                console.log('func socket_reconnect');
+            reconnect:function () {
                 socket.socket.reconnect();
                 console.log('atttempted to connect');
             },
-            on:function(eventName,callback){
-                socket.on(eventName,function(){
+            on:function (eventName, callback) {
+                socket.on(eventName, function () {
                     var args = arguments;
-                    $rootScope.$apply(function(){
-                        callback.apply(socket,args);
+                    $rootScope.$apply(function () {
+                        callback.apply(socket, args);
                     });
                 });
             },
-            emit:function(eventName,data,callback){
-                socket.emit(eventName,data,function(){
+            emit:function (eventName, data, callback) {
+                socket.emit(eventName, data, function () {
                     var args = arguments;
-                    $rootScope.$apply(function(){
-                        if(callback){
-                            callback.apply(socket,args);
+                    $rootScope.$apply(function () {
+                        if (callback) {
+                            callback.apply(socket, args);
                         }
                     });
                 });
             },
-            removeListener:function(eventName,data){
-                console.log("removing listener"+eventName);
-                socket.removeListener(eventName,data);
+            removeListener:function (eventName, data) {
+                console.log("removing listener" + eventName);
+                socket.removeListener(eventName, data);
             },
-            removeAllListeners:function(eventName){
+            removeAllListeners:function (eventName) {
                 socket.removeAllListeners(eventName);
             },
-            disconnect:function(){
+            disconnect:function () {
                 socket.disconnect();
             }
         }
     });
 
 angular.module('userService', ['ngResource']).
-    factory('UserService',function($resource){
-        var userResource =  $resource('/users',
+    factory('UserService', function ($resource) {
+        var userResource = $resource('/users',
             {date:''},
             {
                 'get':{method:'GET', isArray:'true'},

@@ -46,6 +46,13 @@ app.directive('revealModal', function () {
                     //elm.show();
                 }
             });
+            scope.$on('event:auth-registered',function(event){
+                if(attrs.revealModal == 'register'){
+                    elm.trigger('reveal:close');
+                }else{
+
+                }
+            });
 
 
         }
@@ -64,7 +71,7 @@ app.directive('ifAuthed',function($http){
                 }
             });
             scope.$on('event:auth-loginConfirmed', function (event) {
-                console.log("EVENT TRIGGERED"+event);
+                console.log(event);
                 if(attrs.ifAuthed == 'show'){
                     elm.show();
                 }else{
@@ -140,6 +147,9 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     $scope.viewers = [];
     console.log("angular subscribing");
     socket.emit('subscribe', {room:$routeParams.id});
+    socket.on('login',function(){
+        socket.emit('subscribe', {room:$routeParams.id});
+    });
     socket.on('initialuserlist',function(data){
         console.log('initialize user list');
         console.log(data);
@@ -231,9 +241,13 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     });
 });
 
-app.controller('LoginController', function ($scope, $http, authService, authService,userInfoService,socket) {
-
+app.controller('LoginController', function ($scope, $http, authService, authService,userInfoService,socket,$rootScope) {
+        $scope.error = "";
+    $scope.loginAttempt = false;
         $scope.submitAuth = function () {
+            $rootScope.$broadcast('event:auth-loginAttempt');
+            $scope.loginAttempt = true;
+            $scope.error = "";
             console.log($scope.form);
             $http.post('/login', $scope.form)
                 .success(function (data, status) {
@@ -241,24 +255,56 @@ app.controller('LoginController', function ($scope, $http, authService, authServ
                     userInfoService.setUsername($scope.form.username);
                     $scope.form.username = "";
                     $scope.form.password = "";
-                    socket.connect();
-                    authService.loginConfirmed();
-                }).error(function (data, status) {
 
+
+                    authService.loginConfirmed();
+                    window.location.reload();
+                }).error(function (data, status) {
+                    $scope.error = "Failed to connect to server please check your connection";
                 });
         }
+    socket.on('connect', function () {
+        console.log("connect");
+    });
+    socket.on('disconnect', function () {
+        console.log("disconnect");
+    });
+    socket.on('connecting', function (x) {
+        console.log("connecting", x);
+    });
+    socket.on('connect_failed', function () {
+        console.log("connect_failed");
+    });
+    socket.on('close', function () {
+        console.log("close");
+    });
+    socket.on('reconnect', function (a, b) {
+        console.log("reconnect", a, b);
+    });
+    socket.on('reconnecting', function (a, b) {
+        console.log("reconnecting", a, b);
+    });
+    socket.on('reconnect_failed', function () {
+        console.log("reconnect_failed");
+    });
+    $scope.$on('event:auth-loginRequired', function (event) {
+        if($scope.loginAttempt == true){
+            $scope.error = "Username or password is incorrect";
+        }
+    });
 
     });
 
-app.controller('RegisterCtrl', function ($scope, $http) {
+app.controller('RegisterCtrl', function ($scope, $http,$rootScope) {
     $scope.submitRegi = function () {
         $http.post('/register', $scope.form).
             success(function (data, status) {
                 console.log(data);
                 $scope.form = {};
+                $rootScope.$broadcast('event:auth-registered');
             }).
             error(function (data, status) {
-
+                $scope.message = "Registration failed please check connection";
             });
     }
 });
@@ -270,14 +316,14 @@ app.controller('UserInfoCtrl',function($scope,userInfoService,$http,socket){
         console.log("Why u call logout");
         $http.get('/logout').
             success(function(){
-
             }).error(function(){
                 console.log("error on logour??")
             })
     }
     $scope.$on('event:auth-loggedOut',function(event){
         userInfoService.setUsername("Guest");
-        socket.disconnect();
+        window.location.reload();
+
     })
 
 })

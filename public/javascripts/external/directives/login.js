@@ -9,6 +9,9 @@ angular.module('login',['http-auth-interceptor']).directive('login', function ()
             scope.$on('event:auth-loginConfirmed', function () {
                 elm.slideUp();
             });
+            scope.$on('event:auth-loginAttempt', function () {
+                elm.slideUp();
+            });
         }
     }
 });

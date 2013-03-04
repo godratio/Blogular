@@ -189,6 +189,7 @@
 
     <div id="login-inner" ng-controller="LoginController">
         <div reveal-modal="login" id="loginModal" class="reveal-modal [expand, xlarge, large, medium, small]">
+            <p><b>{{error}}</b></p>
         <table border="0" cellpadding="0" cellspacing="0">
             <tr>
                 <th>Username</th>
@@ -209,6 +210,7 @@
 
 <div ng-controller="RegisterCtrl">
 <div reveal-modal="register" id="myModal" class="reveal-modal [expand, xlarge, large, medium, small]">
+    <p><b>{{message}}</b></p>
     <table border="0" cellpadding="0" cellspacing="0">
         <tr>
             <th>Username</th>

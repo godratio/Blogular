@@ -384,122 +384,16 @@ io.configure(function (){
             accept(null, true);
         }
     }));
-    /*
-    io.set('authorization', function (data, accept) {
-        if (data.headers.cookie) {
-            data.cookie = cookie.parse(data.headers.cookie);
-            console.log(data.cookie);
-            data.sessionID = data.cookie['express.sid'];
-            console.log(data.sessionID);
-            // save the session store to the data object
-            // (as required by the Session constructor)
-            data.sessionStore = sessionStore;
-            sessionStore.get(data.sessionID, function (err, session) {
-                console.log(session);
-                if (err || !session) {
-                    accept('Error with getting session from store', false);
-                } else {
-                    // create a session object, passing data as request and our
-                    // just acquired session data
-                    console.log("found in store");
-                    data.session = new Session(data, session);
-                    accept(null, true);
-                }
-            });
-        } else {
-            return accept('No cookie transmitted.', false);
-        }
-       // console.log('socketio authorization called');
-       // callback(null, true); // error first callback style
-    });
-    */
 });
 var connectedusers = [];
 var clients = [];
-/*
-io.sockets.on('connection',function(socket){
-    console.log("connection with socket");
-    socket.on('subscribe',function(data){
-        //socket.join('testroom');
-        var duplicateUserForRoom = false;
-        var usersForThisRoom = [];
-        var duplicateUser = false;
-        var roomToEnter = data.room;
-        roomToEnter = 'testroom';
-        for(var i = 0;i<connectedusers.length;i++){
-            if(connectedusers[i].room == roomToEnter){
-                usersForThisRoom.push(connectedusers[i]);
-            }
-            //if user already subscribed to this room do nothing
-            if(connectedusers[i].id == socket.handshake.user[0]._id && connectedusers[i].room == roomToEnter){
-                console.log("duplicate user for this room");
-                duplicateUserForRoom = true;
-                socket.emit('enterroom',"You are already subscribed");
-            }else{
-                if(connectedusers[i].id == socket.handshake.user[0]._id){
-                    duplicateUser = true;
-                }
-            }
-        }
-
-        if(duplicateUserForRoom == false){
-            console.log("add connecteduser");
-            connectedusers.push({room:roomToEnter,id:socket.handshake.user[0]._id,username:socket.handshake.user[0].username,socketid:socket.id});
-        }
-        if(duplicateUser == false && duplicateUserForRoom == false){
-            console.log("add client");
-            clients[socket.id] = socket;
-        }
-        for(var i = 0;i<connectedusers.length;i++){
-            if(connectedusers[i].room == roomToEnter){
-                console.log('roomtoenter');
-                console.log('sent to ',connectedusers[i].username);
-                clients[connectedusers[i].socketid].emit('enterroom','Hey '+connectedusers[i].username+' has entered test room');
-            }
-
-        }
-        socket.emit("enterroom","You have entered test room");
-    });
-
-    socket.on('unsubscribe',function(data){
-        var duplicateUserForRoom = false;
-        var usersForThisRoom = [];
-        var duplicateUser = false;
-        var roomToEnter = data.room;
-        roomToEnter = 'testroom';
-        for(var i = 0;i<connectedusers.length;i++){
-            if(connectedusers[i].room == roomToEnter){
-                usersForThisRoom.push(connectedusers[i]);
-            }
-            //if user already subscribed to this room do nothing
-            if(connectedusers[i].id == socket.handshake.user[0]._id && connectedusers[i].room == roomToEnter){
-                console.log("remove user for this room");
-                duplicateUserForRoom = true;
-                //not making a deep copy
-                connectedusers.splice(i,1);
-                socket.emit('enterroom',"you have been removed");
-            }else{
-                if(connectedusers[i].id == socket.handshake.user[0]._id){
-                    duplicateUser = true;
-                }
-            }
-        }
-        for(var i = 0;i<connectedusers.length;i++){
-            if(connectedusers[i].room == roomToEnter){
-                console.log('roomtoenter');
-                console.log('sent to ',connectedusers[i].username);
-                clients[connectedusers[i].socketid].emit('enterroom','Hey '+connectedusers[i].username+' has left test room');
-            }
-
-        }
-        socket.emit('enterroom','you have left the room');
-
-    })
-})
-*/
 
 io.sockets.on('connection' , function(socket){
     socket.emit('connected',{conn:'true'});
+    socket.on('loggedin',function(){
+        console.log('logged in ');
+        socket.emit('login');
+    })
     socket.on('subscribe',function(data){
         console.log('subscribed');
 
