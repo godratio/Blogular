@@ -1,8 +1,13 @@
 # Blogular  #
-
-**Blogular** is a blog app that is built to have a ultra fast user interface and use very little resources on the server.
+##Please be aware we are still in alpha many things are not user friendly yet##
+###If you would like to contribute please see bottom of readme###
+**Blogular** is a blog app that is built to have a ultra fast user interface and uses very little resources on the server.
  
 Made to run on low memory environments such as the **Rasberry Pi**.
+
+**Blogular blogs are realtime persisted chat rooms(alpha)**
+See the the example at http://dunami.biz.  Please be aware connection is slow due to the host (AppFog) not supporting web
+sockets.  So your name will not show on the list for a few seconds after login.
 
 ## Easy to get started  ##
 
@@ -35,34 +40,25 @@ At the moment you have to type in
 http://YOURURL/admin.html
 
 to get to the admin section of your site.
-	
+	** IT IS NOT USER FRIENDLY YET **
+
 ##Developers/Contributors##
 
 We are using the latest Javascript stack tech
 
 angularJS nodeJS etc...
 
-Help us make an awesome fast lightweight blog.
+Help us make an awesome fast super-hip lightweight blog.
 
-    <?php
-    $name = $_GET['name'] ?: 'World';
-    echo "Hello $name & everyone else!";
-    ?>
+Some things to implement:
+1. Facebook/Twitter login  ie OAuth
+2. Admin panel user friendliness.
+3. Code clean up.
+4. Threaded comments.
+5. Overall U.I. (blogs)
+6. Downloadable Theme system.
 
-Another paragraph, but with a code block above it.
-
-Want to make something **bold**? Press `Ctrl + B`.
-
-How about *italic*? Press `Ctrl + I`.
-
-> Write a quote with `Ctrl + Q`
-
-No matter what you're working on, you'll have quick access to Markdown syntax with handy keyboard shortcuts and toolbar buttons.
-
-## See your changes instantly with LivePreview ##
-
-Don't guess if your [hyperlink syntax](http://markdownpad.com) is correct; LivePreview will show you exactly what your document looks like every time you press a key.
 
 ## Make it your own ##
 
-Fonts, sizes, color schemes, and even the HTML stylesheets are 100% customizable so you can turn MarkdownPad into your ideal editor.
+Fork it love it do what you need share it with the community.

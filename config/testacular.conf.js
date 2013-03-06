@@ -3,7 +3,7 @@
 
 
 // base path, that will be used to resolve files and exclude
-basePath = './';
+basePath = '../';
 
 
 // list of files / patterns to load in the browser
@@ -11,13 +11,14 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
  'public/javascripts/app/angular.js',
- 'public/javascripts/app/angular-*.js',
+ //'public/javascripts/app/angular-*.js',
   'public/javascripts/app/angular-mocks.js',
- 'public/javascripts/external/blogService.js',
- 'public/javascripts/app/*.js',
-'public/javascripts/external/*.js',
- 'public/javascripts/external/GlobalCtrls/*.js',
-  'tests/unit/controllerSpec.js'
+ //'public/javascripts/external/blogService.js',
+ //'public/javascripts/app/*.js',
+//'public/javascripts/external/*.js',
+'public/javascripts/external/GlobalCtrls/TitleCtrl.js',
+  'tests/unit/controllerSpec.js',
+  'tests/unit/TitleCtrlSpec.js'
 
 ];
 
@@ -30,7 +31,7 @@ exclude = [
 
 // test results reporter to use
 // possible values: 'dots', 'progress', 'junit'
-reporters = ['progress'];
+reporters = ['dots'];
 
 
 // web server port

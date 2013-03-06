@@ -1,15 +1,10 @@
-
-//arbiturary test
-
-describe('testsuite',function(){
-    it('should be a valid test',function(){
-        var testvalue = 'test';
-        expect(testvalue).toBe('test');
-    });
-});
-
-/* jasmine specs for controllers go here */
-/*
+/**
+ * Created with JetBrains WebStorm.
+ * User: RayAndAya
+ * Date: 13/03/06
+ * Time: 15:15
+ * To change this template use File | Settings | File Templates.
+ */
 describe('TitleCtrl', function(){
     var scope, ctrl;
 
@@ -18,7 +13,8 @@ describe('TitleCtrl', function(){
 
 
         scope = $rootScope.$new();
-        ctrl = $controller(TitleCtrl, {$scope: scope});
+        //ctrl = $controller(TitleCtrl, {$scope: scope});
+        ctrl = new TitleCtrl(scope);
     }));
 
     it('should absolutely have a title', function() {
@@ -26,5 +22,3 @@ describe('TitleCtrl', function(){
         expect(scope.title.length).toBeGreaterThan(1);
     });
 });
-*/
-

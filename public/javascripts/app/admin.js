@@ -46,7 +46,8 @@ appAdmin.controller('AdminAppCtrl',function($scope){
     };
 })
 
-appAdmin.controller('LoginController', function ($scope, Admin, authService) {
+appAdmin.controller('LoginController', function ($scope, Admin, authService,$http) {
+        /*
         $scope.submitAuth = function () {
             console.log($scope.form);
             var a = new Admin($scope.form);
@@ -54,6 +55,16 @@ appAdmin.controller('LoginController', function ($scope, Admin, authService) {
                 authService.loginConfirmed();
             });//test
 
+        }
+        */
+        $scope.submitAuth = function () {
+            $http.post('/login', $scope.form)
+                .success(function (data, status) {
+                    console.log(data);
+                    authService.loginConfirmed();
+                }).error(function (data, status) {
+                    $scope.error = "Failed to connect to server please check your connection";
+                });
         }
     }
 );
