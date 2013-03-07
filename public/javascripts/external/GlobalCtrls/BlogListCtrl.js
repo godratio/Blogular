@@ -5,12 +5,9 @@
  * Time: 0:45
  * To change this template use File | Settings | File Templates.
  */
-angular.module('Plugin.Controller.BlogEntries', ['updateService','blogService', 'Scope.onReady'])
+angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService', 'Scope.onReady'])
     .controller('ContentCtrl', function ($scope, show, Blog, BlogsService, $q, $routeParams, UpdateService) {
         console.log($routeParams.name + "parname");
-        var filterByTags = function () {
-
-        }
         $scope.$prepareForReady();
         $scope.filterTag = $routeParams.name;
         //check if user wants to see blogs by categories or not
@@ -27,9 +24,9 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService','blogService', 
                         $scope.$onReady("filter");
                         //**********how to encapsulate in angular??************//
                     });
-                }else{
+                } else {
                     //**********how to encapsulate in angular??************//
-                    BlogsService.getAllBlogs(function(blogs){
+                    BlogsService.getAllBlogs(function (blogs) {
                         $scope.entries = blogs;
                         $scope.fiterTag = $routeParams.name;
                         $scope.$onReady("filter");
@@ -42,15 +39,13 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService','blogService', 
             show.state = false;
             $scope.show = show;
             $scope.getEntries = function () {
-  //              BlogsService.getBlogs(function (data) {
-                    BlogsService.getAllBlogs(function(blogs){
-                         $scope.entries = blogs;
-                        $scope.categories = BlogsService.getCategories();
-                        console.log($scope.categories);
-                        $scope.$onReady("success");
+                BlogsService.getAllBlogs(function (blogs) {
+                    $scope.entries = blogs;
+                    $scope.categories = BlogsService.getCategories();
+                    console.log($scope.categories);
+                    $scope.$onReady("success");
 
-                    });
-//                    });
+                });
             }
 
             $scope.getBackImg = function (_id) {
@@ -61,4 +56,4 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService','blogService', 
                 })
             }
         }
-    })
+    });

@@ -1,7 +1,7 @@
-angular.module('login',['http-auth-interceptor']).directive('login', function () {
+angular.module('login', ['http-auth-interceptor']).directive('login', function () {
     return {
-        restrict:"A",
-        link:function (scope, elm) {
+        restrict: "A",
+        link: function (scope, elm) {
             elm.hide();
             scope.$on('event:auth-loginRequired', function () {
                 elm.slideDown();

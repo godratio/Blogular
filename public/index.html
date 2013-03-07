@@ -37,20 +37,28 @@
     <!-- Initialize JS Plugins -->
     <script src="javascripts/app.js"></script>
     <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>
-    <script src="javascripts/app/angular.js"></script>
-    <script type="text/javascript" src="javascripts/app/angular-resource.js"></script>
+    <script src="javascripts/angular/angular.js"></script>
+    <script type="text/javascript" src="javascripts/angular/angular-resource.js"></script>
     <script type="text/javascript" src="javascripts/external/socketmodule.js"></script>
     <script src="javascripts/app/blog.js"></script>
-    <script type="text/javascript" src="javascripts/external/blogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/resources/blogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/resources/userService.js"></script>
+    <script type="text/javascript" src="javascripts/external/services/BlogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/services/updateService.js"></script>
+    <script type="text/javascript" src="javascripts/external/filters/byTag.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/TitleCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/loader.js"></script>
-    <script type="text/javascript" src="javascripts/external/directives/scope.onready.js"></script>
+    <script type="text/javascript" src="javascripts/external/scope.onready.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="javascripts/external/angular-http-auth.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/login.js"></script>
     <script src="underscore.js"></script>
 </head>
+<a href="https://github.com/ray-garner/Blogular"><img style="position: absolute; top: 0; right: 0; border: 0;"
+                                                      src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+                                                      alt="Fork me on GitHub"></a>
+
 <body ng-app="blogApp">
 
 <!-- Nav Bar -->
@@ -100,7 +108,8 @@
 
                 <h5>Categories</h5>
                 <ul class="side-nav">
-                    <li ng-repeat="cattag in categories"><a href="#/listByTag/{{cattag.name}}">{{cattag.name}}({{cattag.count}})</a></li>
+                    <li ng-repeat="cattag in categories"><a href="#/listByTag/{{cattag.name}}">{{cattag.name}}({{cattag.count}})</a>
+                    </li>
 
                 </ul>
 
@@ -124,13 +133,13 @@
             <li>Category1</li>
             <li>Category1</li>
         </ul>
-       <p> This is the footer content</p>
+        <p> This is the footer content</p>
     </div>
     <div class="four columns right-separator footer-child">
         <p>This is the footer contentK</p>
     </div>
     <div class="four columns footer-child">
-       <p> This is the footer content</p>
+        <p> This is the footer content</p>
     </div>
 
 </footer>
@@ -186,11 +195,10 @@
 -->
 
 
-
-
-    <div id="login-inner" ng-controller="LoginController">
-        <div reveal-modal="login" id="loginModal" class="reveal-modal [expand, xlarge, large, medium, small]">
-            <p><b>{{error}}</b></p>
+<div id="login-inner" ng-controller="LoginController">
+    <div reveal-modal="login" id="loginModal" class="reveal-modal [expand, xlarge, large, medium, small]">
+        <p><b>{{error}}</b></p>
+        <p><b>{{message}}</b></p>
         <table border="0" cellpadding="0" cellspacing="0">
             <tr>
                 <th>Username</th>
@@ -203,31 +211,31 @@
             <tr>
                 <th></th>
                 <td><a class="button" ng-click="submitAuth()">Login</a></td>
-                <td><a class="close-reveal-modal button">Cancel</a> </td>
+                <td><a class="close-reveal-modal button">Cancel</a></td>
             </tr>
         </table>
-            </div>
     </div>
+</div>
 
 <div ng-controller="RegisterCtrl">
-<div reveal-modal="register" id="myModal" class="reveal-modal [expand, xlarge, large, medium, small]">
-    <p><b>{{message}}</b></p>
-    <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
-            <th>Username</th>
-            <td><input type="text" class="login-inp" ng-model="form.username"/></td>
-        </tr>
-        <tr>
-            <th>Password</th>
-            <td><input type="password" class="login-inp" ng-model="form.password"/></td>
-        </tr>
-        <tr>
-            <th></th>
-            <td><a class="button" ng-click="submitRegi()">Register</a></td>
-            <td><a class="close-reveal-modal button">Cancel</a> </td>
-        </tr>
-    </table>
-</div>
+    <div reveal-modal="register" id="myModal" class="reveal-modal [expand, xlarge, large, medium, small]">
+        <p><b>{{message}}</b></p>
+        <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <th>Username</th>
+                <td><input type="text" class="login-inp" ng-model="form.username"/></td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td><input type="password" class="login-inp" ng-model="form.password"/></td>
+            </tr>
+            <tr>
+                <th></th>
+                <td><a class="button" ng-click="submitRegi()">Register</a></td>
+                <td><a class="close-reveal-modal button">Cancel</a></td>
+            </tr>
+        </table>
+    </div>
 </div>
 </body>
 </html>

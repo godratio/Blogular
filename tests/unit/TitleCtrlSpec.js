@@ -5,11 +5,11 @@
  * Time: 15:15
  * To change this template use File | Settings | File Templates.
  */
-describe('TitleCtrl', function(){
+describe('TitleCtrl', function () {
     var scope, ctrl;
 
 
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+    beforeEach(inject(function (_$httpBackend_, $rootScope, $controller) {
 
 
         scope = $rootScope.$new();
@@ -17,7 +17,7 @@ describe('TitleCtrl', function(){
         ctrl = new TitleCtrl(scope);
     }));
 
-    it('should absolutely have a title', function() {
+    it('should absolutely have a title', function () {
         //spec body
         expect(scope.title.length).toBeGreaterThan(1);
     });

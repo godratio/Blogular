@@ -52,11 +52,17 @@ Help us make an awesome fast super-hip lightweight blog.
 
 Some things to implement:
 1. Facebook/Twitter login  ie OAuth
+
 2. Admin panel user friendliness.
+
 3. Code clean up.
+
 4. Threaded comments.
+
 5. Overall U.I. (blogs)
+
 6. Downloadable Theme system.
+
 
 
 ## Make it your own ##

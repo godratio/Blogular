@@ -5,19 +5,19 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-var appAdmin = angular.module('blogAppAdmin', ['userService','login','ngCookies','loaderModule', 'blogResource', 'adminResource', 'http-auth-interceptor', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries']).
+var appAdmin = angular.module('blogAppAdmin', ['userService', 'login', 'ngCookies', 'loaderModule', 'blogResource', 'adminResource', 'http-auth-interceptor', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries']).
     config(function ($routeProvider) {
         $routeProvider.
-            when("/", {templateUrl:"partials/admin/blogList.html"}).
-            when("/edit/:blogId", {templateUrl:"partials/admin/edit.html"}).
-            when("/add", {templateUrl:"partials/admin/createBlogEntry.html"}).
-            when("/adminInstructions", {templateUrl:"partials/admin/adminInstructions.html"})
+            when("/", {templateUrl: "partials/admin/blogList.html"}).
+            when("/edit/:blogId", {templateUrl: "partials/admin/edit.html"}).
+            when("/add", {templateUrl: "partials/admin/createBlogEntry.html"}).
+            when("/adminInstructions", {templateUrl: "partials/admin/adminInstructions.html"})
     });
 
 appAdmin.directive('login', function () {
     return {
-        restrict:"A",
-        link:function (scope, elm) {
+        restrict: "A",
+        link: function (scope, elm) {
             elm.hide();
             scope.$on('event:auth-loginRequired', function () {
                 elm.slideDown();
@@ -29,40 +29,40 @@ appAdmin.directive('login', function () {
     }
 });
 
-appAdmin.factory('show',function(){
-    return {state:false};
-})
+appAdmin.factory('show', function () {
+    return {state: false};
+});
 
-appAdmin.controller('AdminAppCtrl',function($scope){
-    $scope.safeApply = function(fn) {
+appAdmin.controller('AdminAppCtrl', function ($scope) {
+    $scope.safeApply = function (fn) {
         var phase = this.$root.$$phase;
-        if(phase == '$apply' || phase == '$digest') {
-            if(fn && (typeof(fn) === 'function')) {
+        if (phase == '$apply' || phase == '$digest') {
+            if (fn && (typeof(fn) === 'function')) {
                 fn();
             }
         } else {
             this.$apply(fn);
         }
     };
-})
+});
 
-appAdmin.controller('LoginController', function ($scope, Admin, authService,$http) {
+appAdmin.controller('LoginController', function ($scope, Admin, authService, $http) {
         /*
-        $scope.submitAuth = function () {
-            console.log($scope.form);
-            var a = new Admin($scope.form);
-            a.$save({action:'login'}, function () {
-                authService.loginConfirmed();
-            });//test
+         $scope.submitAuth = function () {
+         console.log($scope.form);
+         var a = new Admin($scope.form);
+         a.$save({action:'login'}, function () {
+         authService.loginConfirmed();
+         });//test
 
-        }
-        */
+         }
+         */
         $scope.submitAuth = function () {
             $http.post('/login', $scope.form)
-                .success(function (data, status) {
+                .success(function (data) {
                     console.log(data);
                     authService.loginConfirmed();
-                }).error(function (data, status) {
+                }).error(function () {
                     $scope.error = "Failed to connect to server please check your connection";
                 });
         }
@@ -74,8 +74,8 @@ appAdmin.controller('AddBlogCtrl', function ($scope, Blog, $location, $cookies) 
         console.log($scope.form);
         var categories = $scope.form.categories.split(',');
         var bufferArr = [];
-        angular.forEach(categories,function(value,key){
-            var bufferObj = {name:value};
+        angular.forEach(categories, function (value) {
+            var bufferObj = {name: value};
             bufferArr.push(bufferObj);
         });
         //angular.copy(bufferArr,$scope.form.categories);
@@ -98,7 +98,7 @@ appAdmin.controller('AddBlogCtrl', function ($scope, Blog, $location, $cookies) 
 
 appAdmin.controller('EditBlogCtrl', function ($scope, Blog, $routeParams) {
 
-    Blog.get({id:$routeParams.blogId}, function (blogP) {
+    Blog.get({id: $routeParams.blogId}, function (blogP) {
         $scope.form = blogP[0];
     });
     $scope.editPost = function () {

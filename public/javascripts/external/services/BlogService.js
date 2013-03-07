@@ -1,34 +1,23 @@
-var blogResource = angular.module('blogResource', ['ngResource']).
-    factory('Blog', function ($resource) {
-        return  $resource('/blog/:id',
-            {id:'@_id'},
-            {
-                'get':{method:'GET', isArray:'true'},
-                'save':{method:'POST'}
-            }
-        );
-    });
-
 angular.module('blogService', ['ngResource']).
-    factory('BlogsService', function ($resource, $q, $rootScope) {
+    factory('BlogsService', function ($resource, $q) {
         var blogResource = $resource('/blog/:id',
-            {id:'@_id'},
+            {id: '@_id'},
             {
-                'get':{method:'GET', isArray:'true'},
-                'save':{method:'POST'}
+                'get': {method: 'GET', isArray: 'true'},
+                'save': {method: 'POST'}
             }
         );
-        var commentResource = $resource('/comments',
-            {id:'@_id'},
+        $resource('/comments',
+            {id: '@_id'},
             {
-                'get':{method:'GET', isArray:'true'},
-                'save':{method:'POST'}
+                'get': {method: 'GET', isArray: 'true'},
+                'save': {method: 'POST'}
             }
         );
         var categories = [];
         var allBlogs = [];
         var BlogsService = {
-            getBlogs:function (callback) {
+            getBlogs: function (callback) {
                 var deferred = $q.defer();
                 console.log("the errori shere ??");
                 blogResource.get(function (blogs) {
@@ -39,7 +28,7 @@ angular.module('blogService', ['ngResource']).
                                 var name = blogs[i].categories[x].name;
                                 var added = false;
                                 if (categories.length == 0) {
-                                    categories.push({name:name, count:1});
+                                    categories.push({name: name, count: 1});
                                     added = true;
                                 }
                                 if (added == false) {
@@ -53,7 +42,7 @@ angular.module('blogService', ['ngResource']).
                                     }
                                 }
                                 if (added == false) {
-                                    categories.push({name:name, count:1});
+                                    categories.push({name: name, count: 1});
                                 }
                             }
                         }
@@ -64,10 +53,10 @@ angular.module('blogService', ['ngResource']).
                     function () {
                     });
             },
-            getCategories:function () {
+            getCategories: function () {
                 return categories;
             },
-            getAllBlogs:function (callback) {
+            getAllBlogs: function (callback) {
                 if (allBlogs.length > 0) {
                     // console.log(callback);
                     if (typeof callback == 'function') {
@@ -82,7 +71,7 @@ angular.module('blogService', ['ngResource']).
                 }
                 //return allBlogs;
             },
-            getBlogsByTag:function (tag) {
+            getBlogsByTag: function (tag) {
 
                 var buffer = [];
                 angular.copy(allBlogs, buffer);
@@ -98,7 +87,7 @@ angular.module('blogService', ['ngResource']).
                 }
                 return buffer;
             },
-            getCommentsForBlogEntry:function (id) {
+            getCommentsForBlogEntry: function (id) {
                 //console.log(allBlogs);
                 for (var i = 0; i < allBlogs.length; i++) {
                     // console.log("blogid = "+allBlogs[i]._id + " id = "+id);
@@ -130,85 +119,6 @@ angular.module('blogService', ['ngResource']).
              })
              }
              */
-        }
+        };
         return BlogsService;
-    });
-
-angular.module('updateService', ['ngResource']).
-    factory('UpdateService', function ($resource, $q) {
-        var service = $resource('/lastUpdateSame/:date',
-            {date:''},
-            {
-                'get':{method:'GET', isArray:'true'},
-                'save':{method:'POST'}
-            }
-        );
-        var lastUpdate = {};
-        //update last update variable upon first initialization of factory
-        (function () {
-            service.get(function (date) {
-                this.lastUpdate = date[0].lastUpdate;
-            });
-        }());
-        var UpdateService = {
-            checkIfUpdate:function (callback) {
-
-                service.get({date:lastUpdate.lastUpdate}, function (result) {
-                    var resultToReturn;
-                    if (result[0].result == "true") {
-                        lastUpdate = result[0].lastUpdate;
-                        resultToReturn = true;
-                    } else {
-                        resultToReturn = false;
-                    }
-                    callback(resultToReturn);
-                    return resultToReturn;
-                });
-            }
-        }
-        return UpdateService;
-    })
-angular.module('blogFilter', []).
-    filter('byTag', function () {
-        return function (blogs, tag) {
-            if (blogs == undefined && tag == undefined) {
-                return;
-            } else if (blogs != undefined && tag == undefined) {
-                return blogs;
-            } else if (blogs != undefined && tag != undefined) {
-                var buffer = [];
-                for (var x = 0; x < blogs.length; x++) {
-                    for (var i = 0; i < blogs[x].categories.length; i++) {
-                        if (blogs[x].categories[i].name === tag) {
-                            buffer.push(blogs[x]);
-                        }
-                    }
-                }
-                return buffer;
-            }
-        }
-    });
-var adminResource = angular.module('adminResource', ['ngResource']).
-    factory('Admin', function ($resource) {
-        return  $resource('/auth/:action',
-            {action:''},
-            {
-                'get':{method:'GET', isArray:'true'},
-                'save':{method:'POST'}
-            }
-        );
-    });
-angular.module('foundationjs', []).
-    factory('foundation', function ($rootScope) {
-    });
-
-angular.module('userService', ['ngResource']).
-    factory('UserService', function ($resource) {
-        var userResource = $resource('/users',
-            {date:''},
-            {
-                'get':{method:'GET', isArray:'true'},
-                'save':{method:'POST'}
-            }
-        );
     });

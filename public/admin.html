@@ -23,23 +23,27 @@
     -->
 
     <!-- Included CSS Files (Compressed) -->
-    
+
     <link rel="stylesheet" href="stylesheets/foundation.min.css">
     <link rel="stylesheet" href="stylesheets/app.css">
     <link rel="stylesheet" type="text/css" href="stylesheets/admin/style.css" media="all">
     <script src="javascripts/foundation.min.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <script src="javascripts/modernizr.foundation.js"></script>
-    <script src="javascripts/app/angular.js"></script>
-    <script type="text/javascript" src="javascripts/app/angular-resource.js"></script>
-    <script type="text/javascript" src="javascripts/app/angular-cookies.js"></script>
+    <script src="javascripts/angular/angular.js"></script>
+    <script type="text/javascript" src="javascripts/angular/angular-resource.js"></script>
+    <script type="text/javascript" src="javascripts/angular/angular-cookies.js"></script>
     <script src="javascripts/app/admin.js"></script>
-    <script type="text/javascript" src="javascripts/external/blogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/resources/blogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/services/BlogService.js"></script>
+    <script type="text/javascript" src="javascripts/external/services/updateService.js"></script>
+    <script type="text/javascript" src="javascripts/external/resources/adminService.js"></script>
+    <script type="text/javascript" src="javascripts/external/resources/userService.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/TitleCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/angular-http-auth.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/loader.js"></script>
-    <script type="text/javascript" src="javascripts/external/directives/scope.onready.js"></script>
+    <script type="text/javascript" src="javascripts/external/scope.onready.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/login.js"></script>
     <script src="underscore.js"></script>
 </head>
@@ -53,7 +57,7 @@
         <ul class="nav-bar">
             <li><a href="#/">Blog List</a></li>
             <li><a href="#/add">Create Blog</a></li>
-             <li><a href="#/adminInstructions">Instructions</a></li>
+            <li><a href="#/adminInstructions">Instructions</a></li>
         </ul>
 
         <hr/>
@@ -65,20 +69,20 @@
         <div login>
             <div id="login-inner" ng-controller="LoginController">
 
-                    <table border="0" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <th>Username</th>
-                            <td><input type="text" class="login-inp" ng-model="form.username"/></td>
-                        </tr>
-                        <tr>
-                            <th>Password</th>
-                            <td><input type="password" class="login-inp" ng-model="form.password"/></td>
-                        </tr>
-                        <tr>
-                            <th></th>
-                            <td><a class="button" ng-click="submitAuth()"></a></td>
-                        </tr>
-                    </table>
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th>Username</th>
+                        <td><input type="text" class="login-inp" ng-model="form.username"/></td>
+                    </tr>
+                    <tr>
+                        <th>Password</th>
+                        <td><input type="password" class="login-inp" ng-model="form.password"/></td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td><a class="button" ng-click="submitAuth()"></a></td>
+                    </tr>
+                </table>
             </div>
         </div>
         <div ng-controller="TitleCtrl">
@@ -151,45 +155,47 @@
 -->
 <script>
     /*  wysiwyg editor disabled for time being
-    var editor = new wysihtml5.Editor("textarea", {
-        toolbar:        "toolbar",
-        parserRules:    wysihtml5ParserRules,
-        useLineBreaks:  false
-    });
+     var editor = new wysihtml5.Editor("textarea", {
+     toolbar:        "toolbar",
+     parserRules:    wysihtml5ParserRules,
+     useLineBreaks:  false
+     });
 
-    var log = document.getElementById("log");
+     var log = document.getElementById("log");
 
-    editor
-            .on("load", function() {
-                log.innerHTML += "<div>load</div>";
-            })
-            .on("focus", function() {
-                log.innerHTML += "<div>focus</div>";
-            })
-            .on("blur", function() {
-                log.innerHTML += "<div>blur</div>";
-            })
-            .on("change", function() {
-                log.innerHTML += "<div>change</div>";
-            })
-            .on("paste", function() {
-                log.innerHTML += "<div>paste</div>";
-            })
-            .on("newword:composer", function() {
-                log.innerHTML += "<div>newword:composer</div>";
-            })
-            .on("undo:composer", function() {
-                log.innerHTML += "<div>undo:composer</div>";
-            })
-            .on("redo:composer", function() {
-                log.innerHTML += "<div>redo:composer</div>";
-            });
-            */
+     editor
+     .on("load", function() {
+     log.innerHTML += "<div>load</div>";
+     })
+     .on("focus", function() {
+     log.innerHTML += "<div>focus</div>";
+     })
+     .on("blur", function() {
+     log.innerHTML += "<div>blur</div>";
+     })
+     .on("change", function() {
+     log.innerHTML += "<div>change</div>";
+     })
+     .on("paste", function() {
+     log.innerHTML += "<div>paste</div>";
+     })
+     .on("newword:composer", function() {
+     log.innerHTML += "<div>newword:composer</div>";
+     })
+     .on("undo:composer", function() {
+     log.innerHTML += "<div>undo:composer</div>";
+     })
+     .on("redo:composer", function() {
+     log.innerHTML += "<div>redo:composer</div>";
+     });
+     */
 </script>
 
 <div id="myModal" class="reveal-modal [expand, xlarge, large, medium, small]">
     <h2>Awesome. I have it.</h2>
-    <p class="lead">Your couch.  It is mine.</p>
+
+    <p class="lead">Your couch. It is mine.</p>
+
     <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
     <a class="close-reveal-modal">&#215;</a>
 </div>

@@ -2,29 +2,29 @@ angular.module('socketio', []).
     factory('socket', function ($rootScope) {
         var socket = io.connect('', {
 
-            'reconnect':true,
-            'reconnection delay':500,
-            'reopen delay':3000,
-            'max reconnection attempts':10
+            'reconnect': true,
+            'reconnection delay': 500,
+            'reopen delay': 3000,
+            'max reconnection attempts': 10
 
         });
         console.log("connecting");
         return {
-            connect:function () {
-                var socket = io.connect('', {
+            connect: function () {
+               io.connect('', {
 
-                    'reconnect':true,
-                    'reconnection delay':500,
-                    'reopen delay':3000,
-                    'max reconnection attempts':10
+                    'reconnect': true,
+                    'reconnection delay': 500,
+                    'reopen delay': 3000,
+                    'max reconnection attempts': 10
                 });
 
             },
-            reconnect:function () {
+            reconnect: function () {
                 socket.socket.reconnect();
-                console.log('atttempted to connect');
+                console.log('attempted to connect');
             },
-            on:function (eventName, callback) {
+            on: function (eventName, callback) {
                 socket.on(eventName, function () {
                     var args = arguments;
                     $rootScope.$apply(function () {
@@ -32,7 +32,7 @@ angular.module('socketio', []).
                     });
                 });
             },
-            emit:function (eventName, data, callback) {
+            emit: function (eventName, data, callback) {
                 socket.emit(eventName, data, function () {
                     var args = arguments;
                     $rootScope.$apply(function () {
@@ -42,14 +42,14 @@ angular.module('socketio', []).
                     });
                 });
             },
-            removeListener:function (eventName, data) {
+            removeListener: function (eventName, data) {
                 console.log("removing listener" + eventName);
                 socket.removeListener(eventName, data);
             },
-            removeAllListeners:function (eventName) {
+            removeAllListeners: function (eventName) {
                 socket.removeAllListeners(eventName);
             },
-            disconnect:function () {
+            disconnect: function () {
                 socket.disconnect();
             }
         }
