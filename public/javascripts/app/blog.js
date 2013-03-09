@@ -50,7 +50,7 @@ app.directive('revealModal', function () {
                 if (attrs.revealModal == 'register') {
                     elm.trigger('reveal:close');
                 }
-                if(attrs.revealModal == 'login'){
+                if (attrs.revealModal == 'login') {
                     scope.message = 'Use your credentials to login';
                     elm.reveal();
                 }
@@ -184,12 +184,12 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
         if ($scope.entry.comments == undefined) {
             //noinspection JSPrimitiveTypeWrapperUsage
             $scope.entry.comments = [];
-            $scope.entry.comments.push({body: $scope.body, date: Date.now()});
+            $scope.entry.comments.unshift({body: $scope.body, date: Date.now()});
         } else {
             var buffer = [];
             angular.copy($scope.comments, buffer);
             console.log(buffer);
-            buffer.push({body: $scope.body, date: Date.now()});
+            buffer.unshift({body: $scope.body, date: Date.now()});
             //noinspection JSPrimitiveTypeWrapperUsage
             $scope.entry.comments = buffer;
             // blog.comments.push({body:$scope.body,data:Date.now()});

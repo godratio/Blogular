@@ -1,3 +1,8 @@
+Object.clone = function (obj) {
+    return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyNames(obj).reduce(function (memo, name) {
+        return (memo[name] = Object.getOwnPropertyDescriptor(obj, name)) && memo;
+    }, {}));
+}
 //noinspection JSUnresolvedVariable
 var express = require('express')
     , http = require('http')
@@ -26,6 +31,7 @@ var blogSchema = mongoose.Schema({
     title: String,
     author: String,
     text: String,
+    reversed: {type: Boolean, default: false},
     comments: [
         { body: String, date: Date, username: String }
     ],
@@ -293,17 +299,20 @@ app.post('/blog/:id', ensureAuthenticated, function (req, res) {
         if (user === null) {
             res.send('error:not an admin account', 401);
         } else {
+            //take the blog and update it with the new comment
+            //TODO:Highly ineffecient!!! for the network rework this to only have the comment that needs be updated sent and
+            //sorted
             Blog.findOneAndUpdate({'_id': req.params.id}, req.body, function (err, doc) {
                 if (err) {
                     console.log(err);
                     res.end(JSON.stringify({result: 'error'}));
                 }
-                doc.comments[doc.comments.length - 1].username = user.username;
-                console.log(doc);
-                doc.save(function (err) {
+                doc.comments[0].username = user.username;
+
+                doc.save(function (err, doc) {
                     if (err)console.log(err);
+                    res.end(JSON.stringify(doc));
                 });
-                res.end(JSON.stringify(doc));
             });
         }
 
@@ -334,37 +343,37 @@ app.post('/register', function (req, res) {
             if (userCount < 1 && adminCount < 1 && username != undefined && username != "" && username.length > minUsernameLength && username.length < maxUsernameLength &&
                 //password checks
                 password != undefined && password.length > minPasswordLength && password.length < maxPasswordLength && password != username) {
-                    var user = new User(req.body);
-                    user.save(function (err) {
-                        if (err)console.log(err);
-                        console.log(req.body);
-                    });
-                    return res.end(JSON.stringify({'success': 'true'}));
+                var user = new User(req.body);
+                user.save(function (err) {
+                    if (err)console.log(err);
+                    console.log(req.body);
+                });
+                return res.end(JSON.stringify({'success': 'true'}));
             } else {
                 var errorMessage = "";
-                if(password == undefined){
+                if (password == undefined) {
                     password = "";
                 }
-                if(username == undefined || username == ""){
+                if (username == undefined || username == "") {
                     errorMessage = 'Please enter a username';
-                }else if(username.length < minUsernameLength){
-                    errorMessage = 'Username must be longer than '+minUsernameLength;
-                }else if(username.length > maxUsernameLength){
-                    errorMessage = 'Username must be shorter than '+maxUsernameLength;
-                }else if(password.length < minPasswordLength){
-                    errorMessage = 'Password must be longer than '+minPasswordLength;
-                }else if(password.length > maxPasswordLength){
-                    errorMessage = 'Password must be shorter than '+maxPasswordLength;
-                }else if(password == username){
+                } else if (username.length < minUsernameLength) {
+                    errorMessage = 'Username must be longer than ' + minUsernameLength;
+                } else if (username.length > maxUsernameLength) {
+                    errorMessage = 'Username must be shorter than ' + maxUsernameLength;
+                } else if (password.length < minPasswordLength) {
+                    errorMessage = 'Password must be longer than ' + minPasswordLength;
+                } else if (password.length > maxPasswordLength) {
+                    errorMessage = 'Password must be shorter than ' + maxPasswordLength;
+                } else if (password == username) {
                     errorMessage = 'Password can not be the same as username';
                 }
-                if(userCount >= 1 || adminCount >= 1){
+                if (userCount >= 1 || adminCount >= 1) {
                     errorMessage = 'username already taken';
                 }
-                if(errorMessage == ""){
+                if (errorMessage == "") {
                     errorMessage = 'unknown error';
                 }
-                    return res.end(JSON.stringify({'fail': errorMessage}));
+                return res.end(JSON.stringify({'fail': errorMessage}));
             }
         });
     });
@@ -384,7 +393,7 @@ app.post('/addBlogPost', restrict, function (req, res) {
 app.post('/comments', ensureAuthenticated, function (req) {
     console.log(req.body);
     Blog.findOne({_id: req.body.id}, function (err, blog) {
-        blog.comments.push({body: req.body.body, date: Date.now()});
+        blog.comments.unshift({body: req.body.body, date: Date.now()});
         blog.save(function (err, blog) {
             if (err)console.log(err);
             console.log(blog);
