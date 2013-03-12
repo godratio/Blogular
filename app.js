@@ -28,6 +28,7 @@ db.once('open', function callback() {
 
 //TODO:model definitions need to be moved to seperate files in future.
 var blogSchema = mongoose.Schema({
+    admin:String,
     title: String,
     author: String,
     text: String,
@@ -51,10 +52,12 @@ var userSchema = mongoose.Schema({
     password: String,
     email: String
 });
+/*
 var adminSchema = mongoose.Schema({
     username: String,
     password: String
 });
+*/
 var updateSchema = mongoose.Schema({
     lastUpdate: {type: Date, default: Date.now()}
 });
@@ -62,7 +65,7 @@ var updateSchema = mongoose.Schema({
 
 var Blog = mongoose.model('Blog', blogSchema);
 var User = mongoose.model('User', userSchema);
-var Admin = mongoose.model('Admin', adminSchema);
+//var Admin = mongoose.model('Admin', adminSchema);
 var Update = mongoose.model('Update', updateSchema);
 
 var app = express();
@@ -97,11 +100,14 @@ app.configure(function () {
 // this will be as simple as storing the user ID when serializing, and finding
 // the user by ID when deserializing.
 passport.serializeUser(function (user, done) {
+    console.log(user.id);
     done(null, user.id);
 });
 
 passport.deserializeUser(function (id, done) {
     User.find({_id: id}, function (err, user) {
+        if(err)console.log(err);
+        console.log(user);
         done(err, user);
     });
 });
@@ -135,6 +141,7 @@ passport.use(new LocalStrategy(function (username, password, done) {
 // login page.
 //noinspection FunctionWithInconsistentReturnsJS
 function ensureAuthenticated(req, res, next) {
+    console.log(req);
     if (req.isAuthenticated()) {
         return next();
     }
@@ -144,33 +151,25 @@ function ensureAuthenticated(req, res, next) {
 
 //TODO:config: This will be the intial admin user
 (function checkForAdmin() {
+    var defaultAdminName = 'administrator';
+    var usertype = "superuser";
     console.log('Checking for initial admin user');
-    Admin.count({username: 'admin'}, function (err, count) {
+    User.count({username: defaultAdminName,admin:usertype}, function (err, count) {
         if (count < 1) {
             console.log('did not find admin user ... creating...');
-            var admin = new Admin({username: 'administrator', password: 'administrator'}).
+            var user = new User({username: defaultAdminName, password: defaultAdminName,admin:usertype}).
                 save(function (err) {
                     if (err) {
                         console.log(err);
                         console.log('error creating initial admin user admin');
                     } else {
-                        console.log('inital admin user created username is admin password is admin. \n ' +
-                            'please change password for username admin a.s.a.p.');
+                        console.log('inital admin user created username is '+defaultAdminName+'  password is '+defaultAdminName+'. \n ' +
+                            'please change password for username '+defaultAdminName+' a.s.a.p.');
                     }
                 });
         }
     });
 })();
-
-function restrict(req, res, next) {
-    if (req.session.loggedIn) {
-        next();
-    } else {
-        req.session.error = 'Access denied!';
-        //noinspection MagicNumberJS
-        res.send('authentication failed', 401);
-    }
-}
 
 app.configure('development', function () {
     app.use(express.errorHandler());
@@ -275,7 +274,7 @@ app.post('/auth/login', function (req, res) {
 
 });
 
-app.post('/blog', restrict, function (req, res) {
+app.post('/blog', ensureAuthenticated, function (req, res) {
     console.log("blog route");
     var title = req.body.title;
     //noinspection JSValidateTypes
@@ -381,7 +380,7 @@ app.post('/register', function (req, res) {
 
 });
 
-app.post('/addBlogPost', restrict, function (req, res) {
+app.post('/addBlogPost', ensureAuthenticated, function (req, res) {
     var newBlogEntry = new Blog(req.body);
     newBlogEntry.save(function (err) {
         if (err)console.log(err);
@@ -401,7 +400,7 @@ app.post('/comments', ensureAuthenticated, function (req) {
     })
 });
 
-app.post('/upload', restrict, function (req, res) {
+app.post('/upload', ensureAuthenticated, function (req, res) {
     var name = req.files.userPhoto.name;
     fs.readFile(req.files.userPhoto.path, function (err, data) {
         var newPath = __dirname + "/public/uploads/" + name;
@@ -411,7 +410,7 @@ app.post('/upload', restrict, function (req, res) {
     });
 });
 
-app.delete('/blog/:id', restrict, function (req) {
+app.delete('/blog/:id', ensureAuthenticated, function (req) {
     console.log('deleted' + req.params.id);
     Blog.remove({'_id': req.params.id}, function (err) {
         if (err)
