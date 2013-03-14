@@ -1,4 +1,4 @@
-var app = angular.module('blogApp', ['userService', 'http-auth-interceptor', 'login', 'socketio', 'updateService', 'Scope.onReady', 'blogResource', 'loaderModule', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries', 'blogFilter']).
+var app = angular.module('blogApp', ['twitterService','userService', 'http-auth-interceptor', 'login', 'socketio', 'updateService', 'Scope.onReady', 'blogResource', 'loaderModule', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries', 'blogFilter']).
     config(function ($routeProvider) {
         $routeProvider.
             when("/", {templateUrl: "partials/blog.html"}).
@@ -10,7 +10,6 @@ var app = angular.module('blogApp', ['userService', 'http-auth-interceptor', 'lo
             when("/listByTag/:name", {templateUrl: "partials/blog.html"})
     });
 
-//var becomeMainContent = angular.module('becomeMainContentModule',[])
 app.directive('becomeMainContent', function () {
     return {
         link: function (scope, ele) {
@@ -124,9 +123,11 @@ app.controller('blogViewCtrl', function ($scope, show, categoryService, BlogsSer
     $scope.show = show;
 });
 //TODO:add a simple twitter feed here
-var TwitterCtrl = function ($scope, Blog) {
-    //$scope.twitterResult = Blog.get();
-};
+app.controller('TwitterCtrl',function ($scope, Blog,Twitter,$routeParams) {
+    $scope.twitterResult =  Twitter.get();
+    console.log("Twitter result");
+    console.log($scope.twitterResult);
+});
 
 var AboutCtrl = function ($scope, $http) {
 };

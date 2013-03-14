@@ -28,7 +28,6 @@ db.once('open', function callback() {
 
 //TODO:model definitions need to be moved to seperate files in future.
 var blogSchema = mongoose.Schema({
-    admin:String,
     title: String,
     author: String,
     text: String,
@@ -50,6 +49,7 @@ var blogSchema = mongoose.Schema({
 var userSchema = mongoose.Schema({
     username: String,
     password: String,
+    admin:String,
     email: String
 });
 /*
@@ -255,10 +255,10 @@ app.post('/login',
     function (req, res) {
         res.send('authed', 200);
     });
-
+//for admin side
 app.post('/auth/login', function (req, res) {
     console.log(req.body);
-    Admin.findOne({'username': req.body.username, 'password': req.body.password}, function (err, administrator) {
+    User.findOne({'username': req.body.username, 'password': req.body.password,admin:{$in:['superuser','admin']}}, function (err, administrator) {
         if (err)console.log(err);
         console.log(administrator);
         if (administrator) {
@@ -292,7 +292,8 @@ app.post('/blog', ensureAuthenticated, function (req, res) {
 app.post('/blog/:id', ensureAuthenticated, function (req, res) {
     delete req.body._id;
     console.log(req.user[0]._doc.username);
-    Admin.findOne({username: req.user[0]._doc.username}, function (err, user) {
+    User.findOne({username: req.user[0]._doc.username}, function (err, user) {
+        console.log(user);
         loggedInUser = user;
         console.log(loggedInUser);
         if (user === null) {
@@ -306,7 +307,11 @@ app.post('/blog/:id', ensureAuthenticated, function (req, res) {
                     console.log(err);
                     res.end(JSON.stringify({result: 'error'}));
                 }
-                doc.comments[0].username = user.username;
+                if(doc.comments == undefined || doc.comments.length < 1){
+                    //do nothing for now
+                }else{
+                    doc.comments[0].username = user.username;
+                }
 
                 doc.save(function (err, doc) {
                     if (err)console.log(err);
@@ -333,7 +338,7 @@ app.post('/register', function (req, res) {
         if (err)console.log(err);
         userCount = count;
         //then get admin count
-        Admin.count({username: username}, function (err, count) {
+        User.count({username: username,admin :{$in:['superuser','admin']}} , function (err, count) {
             if (err)console.log(err);
             adminCount = count;
             //then check count

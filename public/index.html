@@ -48,6 +48,7 @@
     <script type="text/javascript" src="javascripts/external/filters/byTag.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/TitleCtrl.js"></script>
     <script type="text/javascript" src="javascripts/external/GlobalCtrls/BlogListCtrl.js"></script>
+    <script type="text/javascript" src="javascripts/external/resources/twitterService.js"></script>
     <script type="text/javascript" src="javascripts/external/directives/loader.js"></script>
     <script type="text/javascript" src="javascripts/external/scope.onready.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -116,7 +117,10 @@
                 <div class="panel" ng-controller="TwitterCtrl">
                     <h5>Featured</h5>
 
-                    <p ng-repeat="tweet in twitterResult">{{tweet.text}}</p>
+                    <div ng-repeat="tweet in twitterResult.results">
+                        <img src="{{tweet.profile_image_url}}" alt="{{tweet.from_user}}"/>
+                        <p>{{tweet.text}}</p>
+                    </div>
                     <a href="#">Read More &rarr;</a>
                 </div>
 
@@ -125,7 +129,9 @@
     </div>
     <!-- End Sidebar -->
 </div>
+
 <footer class="row border-main border-footer">
+    <!--
     <div class="four columns right-separator footer-child">
         <ul>
             <li>Category1</li>
@@ -141,8 +147,9 @@
     <div class="four columns footer-child">
         <p> This is the footer content</p>
     </div>
-
+          -->
 </footer>
+<!--
 <div row>
     <div class="six columns border-footer">
         Powerd by AngularJS and Dunami
@@ -150,7 +157,9 @@
     <div class="six columns border-footer">
         Copyright Dunami
     </div>
+
 </div>
+    -->
 <!-- End Footer -->
 
 <!-- Included JS Files (Uncompressed) -->
