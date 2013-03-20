@@ -60,6 +60,7 @@ angular.module('http-auth-interceptor', [])
             }
 
             function error(response) {
+                console.log(response);
                 var deferred;
                 if (response.status === 401) {
                     deferred = $q.defer();

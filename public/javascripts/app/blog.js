@@ -15,6 +15,7 @@ app.directive('becomeMainContent', function () {
         link: function (scope, ele) {
             //iele.animate({width:900});
             console.log("directive called");
+
             scope.$whenReady(
                 function () { //called when $scope.$onReady() is run
                     console.log("called when ready");
@@ -64,7 +65,8 @@ app.directive('ifAuthed', function ($http) {
     return {
         link: function (scope, elm, attrs) {
             console.log('hideIfAuthedCalled');
-            $http.post('/checkauthed').then(function () {
+            $http.get('/checkauthed').then(function (data) {
+                scope.username = data.data;
                 if (attrs.ifAuthed == 'show') {
                     elm.show();
                 } else {
@@ -107,7 +109,7 @@ app.factory('categoryService', function () {
     ];
 });
 app.service('userInfoService', function () {
-    var username = {username: "Guest"};
+    var username = "Guest";
     return {
         getUsername: function () {
             console.log(username);
@@ -245,8 +247,11 @@ app.controller('LoginController', function ($scope, $http, authService, userInfo
         console.log($scope.form);
         $http.post('/login', $scope.form)
             .success(function (data, status) {
+                console.log('logged in with status '+status);
                 console.log(data);
+                console.log('setting username '+$scope.form.username);
                 userInfoService.setUsername($scope.form.username);
+                $scope.userinfo = $scope.form;
                 $scope.form.username = "";
                 $scope.form.password = "";
 
@@ -307,19 +312,20 @@ app.controller('RegisterCtrl', function ($scope, $http, $rootScope) {
     }
 });
 
-app.controller('UserInfoCtrl', function ($scope, userInfoService, $http, socket) {
-    //TODO: Why is $scope.userinfo.username undefined userinfo???WTF
-    $scope.userinfo = userInfoService.getUsername();
+app.controller('UserInfoCtrl', function ($scope, userInfoService, $http) {
+    $scope.username = userInfoService.getUsername();
     $scope.logout = function () {
         console.log("Why u call logout");
-        $http.get('/logout').
+        $http.post('/logout').
             success(function () {
+                console.log("success should never come here");
             }).error(function () {
                 console.log("error on logout??")
             })
     };
     $scope.$on('event:auth-loggedOut', function (event) {
-        userInfoService.setUsername("Guest");
+        //userInfoService.setUsername("Guest");
+        $scope.username = "Guest";
         window.location.reload();
 
     })

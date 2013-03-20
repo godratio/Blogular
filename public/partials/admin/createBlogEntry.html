@@ -22,8 +22,12 @@
 
         <label for="titleImage">Title Image:</label>
         <input id="titleImage" ng-model="form.titleImage" name="titleImage">
-        <label for="categories">Categories/tags:</label>
+        <h4>Tagegories</h4>
+        <p>These will show up as categories on the main screen and be used to filter aritcles on the main page.</p>
+        <p>These are to be comma seperated values ONLY!</p>
+        <label for="categories">Categories/Tags:</label>
         <input type="text" name="categories" id="categories" ng-model="form.categories">
+        <p>Comma seperated values ONLY!! Be aware no validation here is added yet!</p>
         <p>
             <a ng-click="submitPost()" class="button" resetOnSubmit="true"></a>
         </p>
