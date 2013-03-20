@@ -23,7 +23,7 @@ mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback() {
-    ("connected");
+    console.log("connected");
 });
 
 //TODO:model definitions need to be moved to seperate files in future.
@@ -100,14 +100,12 @@ app.configure(function () {
 // this will be as simple as storing the user ID when serializing, and finding
 // the user by ID when deserializing.
 passport.serializeUser(function (user, done) {
-    (user.id);
     done(null, user.id);
 });
 
 passport.deserializeUser(function (id, done) {
     User.find({_id: id}, function (err, user) {
         if(err)(err);
-        (user);
         done(err, user);
     });
 });
@@ -141,7 +139,6 @@ passport.use(new LocalStrategy(function (username, password, done) {
 // login page.
 //noinspection FunctionWithInconsistentReturnsJS
 function ensureAuthenticated(req, res, next) {
-    (req);
     if (req.isAuthenticated()) {
         return next();
     }
@@ -160,7 +157,7 @@ function ensureAuthenticated(req, res, next) {
             var user = new User({username: defaultAdminName, password: defaultAdminName,admin:usertype}).
                 save(function (err) {
                     if (err) {
-                        (err);
+                        console.log(err);
                         ('error creating initial admin user admin');
                     } else {
                         ('inital admin user created username is '+defaultAdminName+'  password is '+defaultAdminName+'. \n ' +
@@ -193,11 +190,10 @@ app.get('/lastUpdateSame', function (req, res) {
     Update.findOne({}).lean().exec(function (err, update) {
         var returnResult = [];
         if (err)(err);
-        (update);
         if (update == null) {
             var updateCreate = new Update();
             updateCreate.save(function (err, newUpdate) {
-                if (err)(err);
+                if (err)console.log(err);
                 returnResult.push(newUpdate);
                 res.end(JSON.stringify(returnResult));
             })
@@ -234,7 +230,6 @@ app.get('/lastUpdateSame/:date', function (req, res) {
             }
         }
         response.push(obj);
-        (response);
         return res.end(JSON.stringify(response));
     });
 
@@ -242,10 +237,6 @@ app.get('/lastUpdateSame/:date', function (req, res) {
 
 app.post('/logout', function (req, res) {
     req.logout();
-
-    ("logged out user");
-
-
     //noinspection MagicNumberJS
     res.send('loggedout', 410);
 });
@@ -257,15 +248,11 @@ app.post('/login',
     });
 //for admin side
 app.post('/auth/login', function (req, res) {
-    (req.body);
     User.findOne({'username': req.body.username, 'password': req.body.password,admin:{$in:['superuser','admin']}}, function (err, administrator) {
-        if (err)(err);
-        (administrator);
+        if (err)console.log(err);
         if (administrator) {
-            ("logged in");
             req.session.loggedIn = true;
         } else {
-            ("not in");
             req.session.loggedIn = false;
         }
 
@@ -279,7 +266,6 @@ app.get('username',ensureAuthenticated,function(req,res){
 });
 
 app.post('/blog', ensureAuthenticated, function (req, res) {
-    ("blog route");
     var title = req.body.title;
     //noinspection JSValidateTypes
     if (title === '' || title === null || title === undefined)return res.send('need a title', 404);
@@ -287,7 +273,7 @@ app.post('/blog', ensureAuthenticated, function (req, res) {
 
         var newBlogEntry = new Blog(req.body);
         newBlogEntry.save(function (err) {
-            if (err)(err);
+            if (err)console.log(err);
         });
         return res.end(JSON.stringify({'success': 'true'}));
     }
@@ -295,9 +281,7 @@ app.post('/blog', ensureAuthenticated, function (req, res) {
 //edit
 app.post('/blog/:id', ensureAuthenticated, function (req, res) {
     delete req.body._id;
-    (req.session.passport._doc.username);
     User.findOne({username: req.user[0]._doc.username}, function (err, user) {
-        (user);
         loggedInUser = user;
         (loggedInUser);
         if (user === null) {
@@ -308,7 +292,7 @@ app.post('/blog/:id', ensureAuthenticated, function (req, res) {
             //sorted
             Blog.findOneAndUpdate({'_id': req.params.id}, req.body, function (err, doc) {
                 if (err) {
-                    (err);
+                    console.log(err);
                     res.end(JSON.stringify({result: 'error'}));
                 }
                 if(doc.comments == undefined || doc.comments.length < 1){
@@ -318,7 +302,7 @@ app.post('/blog/:id', ensureAuthenticated, function (req, res) {
                 }
 
                 doc.save(function (err, doc) {
-                    if (err)(err);
+                    if (err)console.log(err);
                     res.end(JSON.stringify(doc));
                 });
             });
@@ -339,11 +323,11 @@ app.post('/register', function (req, res) {
         maxPasswordLength = 16;
 
     User.count({username: username}, function (err, count) {
-        if (err)(err);
+        if (err)console.log(err);
         userCount = count;
         //then get admin count
         User.count({username: username,admin :{$in:['superuser','admin']}} , function (err, count) {
-            if (err)(err);
+            if (err)console.log(err);
             adminCount = count;
             //then check count
             //TODO:redo this section of code in promises
@@ -353,8 +337,7 @@ app.post('/register', function (req, res) {
                 password != undefined && password.length > minPasswordLength && password.length < maxPasswordLength && password != username) {
                 var user = new User(req.body);
                 user.save(function (err) {
-                    if (err)(err);
-                    (req.body);
+                    if (err)console.log(err);
                 });
                 return res.end(JSON.stringify({'success': 'true'}));
             } else {
@@ -392,19 +375,16 @@ app.post('/register', function (req, res) {
 app.post('/addBlogPost', ensureAuthenticated, function (req, res) {
     var newBlogEntry = new Blog(req.body);
     newBlogEntry.save(function (err) {
-        if (err)(err);
-        (req.body);
+        if (err)console.log(err);
     });
     return res.end(JSON.stringify({'success': 'true'}));
 });
 
 app.post('/comments', ensureAuthenticated, function (req) {
-    (req.body);
     Blog.findOne({_id: req.body.id}, function (err, blog) {
         blog.comments.unshift({body: req.body.body, date: Date.now()});
         blog.save(function (err, blog) {
-            if (err)(err);
-            (blog);
+            if (err)console.log(err);
         })
     })
 });
@@ -423,12 +403,12 @@ app.delete('/blog/:id', ensureAuthenticated, function (req) {
     ('deleted' + req.params.id);
     Blog.remove({'_id': req.params.id}, function (err) {
         if (err)
-            (err);
+            console.log(err);
     });
 });
 
 var server = http.createServer(app).listen(app.get('port'), function () {
-    ("server listening " + app.get('port'));
+    console.log("server listening " + app.get('port'));
 });
 var io = require('socket.io').listen(server);
 
@@ -470,8 +450,7 @@ io.sockets.on('connection', function (socket) {
         }
         var clients = io.sockets.clients(data.room);
         for (var i = 0; i < clients.length; i++) {
-            ("================================================================next client loading....");
-            (clients[i]);
+            console.log("================================================================next client loading....");
         }
         if (duplicateUserForRoom == false) {
             socket.join(data.room);
@@ -490,7 +469,7 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.in(data.room).emit('commentsupdated', '', "updateNow");
     });
     socket.on('unsubscribe', function (data) {
-        ('unsubscribe');
+        console.log('unsubscribe');
         socket.leave(data.room);
         var usersForThisRoom = [];
         var buffer = connectedusers;
@@ -506,15 +485,14 @@ io.sockets.on('connection', function (socket) {
         (io.sockets.manager.rooms);
         var clients = io.sockets.clients(data.room);
         for (var i = 0; i < clients.length; i++) {
-            ("================================================================next client loading....");
-            (clients[i]);
+            console.log("================================================================next client loading....");
         }
         socket.broadcast.to(data.room).emit('updateusers', usersForThisRoom);
     });
     socket.on('disconnect', function () {
         socket.leave(socket.room);
         var usersForThisRoom = [];
-        ('disconnect');
+        console.log('disconnect');
         var buffer = connectedusers;
         for (var i = 0; i < connectedusers.length; i++) {
             if (connectedusers[i].id == socket.handshake.user[0]._id) {
@@ -525,7 +503,7 @@ io.sockets.on('connection', function (socket) {
             }
         }
         connectedusers = buffer;
-        (socket.handshake.user[0].username);
+        console.log(socket.handshake.user[0].username);
         socket.broadcast.to(socket.room).emit('updateusers', usersForThisRoom);
     });
 });
