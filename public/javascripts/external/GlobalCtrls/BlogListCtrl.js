@@ -18,11 +18,13 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
                 if (result) {
                     BlogsService.getBlogs(function (blogs) {
                         $scope.entries = blogs;
+
                         //**********how to encapsulate in angular??************//
                         $scope.fiterTag = $routeParams.name;
                         //$scope.entries = BlogsService.getAllBlogs();
                         $scope.$onReady("filter");
                         //**********how to encapsulate in angular??************//
+                        chopBlogText();
                     });
                 } else {
                     //**********how to encapsulate in angular??************//
@@ -30,6 +32,7 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
                         $scope.entries = blogs;
                         $scope.fiterTag = $routeParams.name;
                         $scope.$onReady("filter");
+                        chopBlogText();
                     });
                     //**********how to encapsulate in angular??************//
                 }
@@ -44,7 +47,7 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
                     $scope.categories = BlogsService.getCategories();
                     console.log($scope.categories);
                     $scope.$onReady("success");
-
+                    chopBlogText();
                 });
             }
 
@@ -56,4 +59,14 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
                 })
             }
         }
+        //conv method
+         function chopBlogText(){
+             for(var i = 0;i<$scope.entries.length;i++){
+                 $scope.entries[i].text = chopText($scope.entries[i].text,100);
+             }
+         }
+
+        function chopText(txt,no){return txt.substring(0,no);}
+
+
     });

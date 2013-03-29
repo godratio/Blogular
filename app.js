@@ -196,7 +196,7 @@ app.get('/lastUpdateSame', function (req, res) {
                 if (err)console.log(err);
                 returnResult.push(newUpdate);
                 res.end(JSON.stringify(returnResult));
-            })
+            });
         } else {
             returnResult.push(update);
             res.end(JSON.stringify(returnResult));
@@ -305,6 +305,8 @@ app.post('/blog/:id', ensureAuthenticated, function (req, res) {
                     if (err)console.log(err);
                     res.end(JSON.stringify(doc));
                 });
+                var update = new Update();
+                update.save(function(err,update){if(err)console.log(err);});
             });
         }
 
@@ -385,6 +387,8 @@ app.post('/comments', ensureAuthenticated, function (req) {
         blog.comments.unshift({body: req.body.body, date: Date.now()});
         blog.save(function (err, blog) {
             if (err)console.log(err);
+            var update = new Update();
+            update.save(function(err,update){if(err)console.log(err);});
         })
     })
 });
@@ -404,6 +408,8 @@ app.delete('/blog/:id', ensureAuthenticated, function (req) {
     Blog.remove({'_id': req.params.id}, function (err) {
         if (err)
             console.log(err);
+        update.save(function(err,update){if(err)console.log(err);});
+
     });
 });
 

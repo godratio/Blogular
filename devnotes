@@ -1,3 +1,6 @@
-Twitter Resource
+Limit blog list to 100 chars
 Search params are limited to 1000chars
 Limit Tagegories to same 1000chars
+Add abilityto have multiple blogs
+Use parse.com for data or sql for low power devices.
+fix all bugs b4 moving on.
