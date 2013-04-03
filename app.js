@@ -4,6 +4,7 @@ Object.clone = function (obj) {
     }, {}));
 }
 //noinspection JSUnresolvedVariable
+
 var express = require('express')
     , http = require('http')
     , routes = require('./routes')
@@ -17,9 +18,40 @@ var express = require('express')
     , passportSocketIo = require("passport.socketio")
     , MemoryStore = express.session.MemoryStore
     , sessionStore = new MemoryStore()
-    , q = require('q');
+    , q = require('q')
+    , blogModels = require('./models/models');
 
+//set up database models to mongoose
+var Blog = blogModels.Blog;
+var User = blogModels.User;
+var Update = blogModels.Update;
+//set up db connections
+                /*
+var mongooseDB = {};
+var sqlDB = {};
+var connection = function(db,url,table){
+    if(url == undefined){
+        url = "localhost";
+    }
+    if(table == undefined){
+        table = 'test';
+    }
+    if(db === sqlDB){
+        return mongoose.connect('mongodb://'+url+'/'+table+'');
+
+    }else if(db == mongooseDB){
+        return undefined; //return sql connection here
+    }else{
+        console.log("Error: unknown datbase presently only support mysql or mongo with mongoose adapter");
+    }
+};
+    */
+
+//schemas
+
+//choose which db here
 mongoose.connect('mongodb://localhost/test');
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback() {
@@ -27,46 +59,17 @@ db.once('open', function callback() {
 });
 
 //TODO:model definitions need to be moved to seperate files in future.
-var blogSchema = mongoose.Schema({
-    title: String,
-    author: String,
-    text: String,
-    reversed: {type: Boolean, default: false},
-    comments: [
-        { body: String, date: Date, username: String }
-    ],
-    date: { type: Date, default: Date.now },
-    hidden: Boolean,
-    meta: {
-        votes: Number,
-        favs: Number
-    },
-    titleImage: String,
-    categories: [
-        {name: String}
-    ]
-});
-var userSchema = mongoose.Schema({
-    username: String,
-    password: String,
-    admin:String,
-    email: String
-});
+
+
 /*
 var adminSchema = mongoose.Schema({
     username: String,
     password: String
 });
 */
-var updateSchema = mongoose.Schema({
-    lastUpdate: {type: Date, default: Date.now()}
-});
 
 
-var Blog = mongoose.model('Blog', blogSchema);
-var User = mongoose.model('User', userSchema);
-//var Admin = mongoose.model('Admin', adminSchema);
-var Update = mongoose.model('Update', updateSchema);
+
 
 var app = express();
 //noinspection JSValidateTypes
