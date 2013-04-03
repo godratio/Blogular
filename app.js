@@ -10,53 +10,21 @@ var express = require('express')
     , routes = require('./routes')
     , user = require('./routes/user')
     , path = require('path')
-    , mongoose = require('mongoose')
     , fs = require('fs')
-    , passport = require('passport')
-    , LocalStrategy = require('passport-local').Strategy
     , cookie = require('cookie')
     , passportSocketIo = require("passport.socketio")
     , MemoryStore = express.session.MemoryStore
     , sessionStore = new MemoryStore()
     , q = require('q')
-    , blogModels = require('./models/models');
+    , blogModels = require('./models/models')
+    , passport = require('./auth/local').passport_local;
 
 //set up database models to mongoose
 var Blog = blogModels.Blog;
 var User = blogModels.User;
 var Update = blogModels.Update;
-//set up db connections
-                /*
-var mongooseDB = {};
-var sqlDB = {};
-var connection = function(db,url,table){
-    if(url == undefined){
-        url = "localhost";
-    }
-    if(table == undefined){
-        table = 'test';
-    }
-    if(db === sqlDB){
-        return mongoose.connect('mongodb://'+url+'/'+table+'');
 
-    }else if(db == mongooseDB){
-        return undefined; //return sql connection here
-    }else{
-        console.log("Error: unknown datbase presently only support mysql or mongo with mongoose adapter");
-    }
-};
-    */
 
-//schemas
-
-//choose which db here
-mongoose.connect('mongodb://localhost/test');
-
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback() {
-    console.log("connected");
-});
 
 //TODO:model definitions need to be moved to seperate files in future.
 
@@ -96,43 +64,6 @@ app.configure(function () {
     app.use(require('less-middleware')({ src: __dirname + '/public' }));
     app.use(express.static(path.join(__dirname, 'public')));
 });
-
-// Passport session setup.
-// To support persistent login sessions, Passport needs to be able to
-// serialize users into and deserialize users out of the session. Typically,
-// this will be as simple as storing the user ID when serializing, and finding
-// the user by ID when deserializing.
-passport.serializeUser(function (user, done) {
-    done(null, user.id);
-});
-
-passport.deserializeUser(function (id, done) {
-    User.find({_id: id}, function (err, user) {
-        if(err)(err);
-        done(err, user);
-    });
-});
-
-// Use the LocalStrategy within Passport.
-// Strategies in passport require a `verify` function, which accept
-// credentials (in this case, a username and password), and invoke a callback
-// with a user object. In the real world, this would query a database;
-// however, in this example we are using a baked-in set of users.
-passport.use(new LocalStrategy(function (username, password, done) {
-    User.findOne({ username: username }, function (err, user) {
-        if (err) {
-            return done(err);
-        }
-        if (!user) {
-            return done(null, false, { message: 'Unknown user ' + username });
-        }
-        if (password == user.password) {
-            return done(null, user);
-        } else {
-            return done(null, false, { message: 'Invalid password' });
-        }
-    });
-}));
 
 
 // Simple route middleware to ensure user is authenticated.

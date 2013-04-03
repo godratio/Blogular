@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+
 var blogSchema = mongoose.Schema({
     title: String,
     author: String,
@@ -27,9 +28,17 @@ var userSchema = mongoose.Schema({
 var updateSchema = mongoose.Schema({
     lastUpdate: {type: Date, default: Date.now()}
 });
+mongoose.connect('mongodb://localhost/test');
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback() {
+    console.log("connected");
+});
 var Blog = mongoose.model('Blog', blogSchema);
 var User = mongoose.model('User', userSchema);
 var Update = mongoose.model('Update', updateSchema);
+
 module.exports = {
     Blog: Blog,
     User:User,
