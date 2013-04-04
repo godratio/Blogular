@@ -7,8 +7,7 @@ Object.clone = function (obj) {
 
 var express = require('express')
     , http = require('http')
-    , routes = require('./routes')
-    , user = require('./routes/user')
+    , blogRoutes = require('./routes/blog')
     , path = require('path')
     , fs = require('fs')
     , cookie = require('cookie')
@@ -19,28 +18,18 @@ var express = require('express')
     , blogModels = require('./models/models')
     , passport = require('./auth/local').passport_local;
 
+
+
+
 //set up database models to mongoose
 var Blog = blogModels.Blog;
 var User = blogModels.User;
 var Update = blogModels.Update;
 
-
-
-//TODO:model definitions need to be moved to seperate files in future.
-
-
-/*
-var adminSchema = mongoose.Schema({
-    username: String,
-    password: String
-});
-*/
-
-
-
-
 var app = express();
 //noinspection JSValidateTypes
+
+
 app.configure(function () {
     //noinspection JSUnresolvedVariable,JSValidateTypes,MagicNumberJS
     app.set('port', process.env.PORT || 3000);
@@ -66,19 +55,7 @@ app.configure(function () {
 });
 
 
-// Simple route middleware to ensure user is authenticated.
-// Use this route middleware on any resource that needs to be protected. If
-// the request is authenticated (typically via a persistent login session),
-// the request will proceed. Otherwise, the user will be redirected to the
-// login page.
-//noinspection FunctionWithInconsistentReturnsJS
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    //noinspection MagicNumberJS
-    res.send('authfail', 401);
-}
+
 
 //TODO:config: This will be the intial admin user
 (function checkForAdmin() {
@@ -106,19 +83,30 @@ app.configure('development', function () {
     app.use(express.errorHandler());
 });
 
-app.get('/blog', function (req, res) {
-    Blog.find().lean().exec(function (err, posts) {
-        return res.end(JSON.stringify(posts));
-    });
+//Blog Routes
+app.get('/blog', blogRoutes.allBlogs);
 
-});
+app.get('/blog/:id', blogRoutes.getABlog);
 
-app.get('/blog/:id', function (req, res) {
-    var id = req.params.id;
-    Blog.find({'_id': id}).lean().exec(function (err, post) {
-        return res.end(JSON.stringify(post));
+app.post('/blog', passport.ensureAuthenticated, blogRoutes.createBlog);
+//edit
+app.post('/blog/:id', passport.ensureAuthenticated, blogRoutes.updateBlog);
+
+app.delete('/blog/:id', passport.ensureAuthenticated, blogRoutes.deleteBlog);
+
+//Auth Routes
+
+app.get('/checkauthed', passport.ensureAuthenticated, function (req, res) {
+    User.find({_id:req.session.passport.user},function(err,user){
+        if(err)console.log(err);
+        console.log(user[0].username);
+        //noinspection MagicNumberJS
+        return res.send(user[0].username, 200);
     })
 });
+
+
+//Update docs routes
 
 app.get('/lastUpdateSame', function (req, res) {
     Update.findOne({}).lean().exec(function (err, update) {
@@ -135,15 +123,6 @@ app.get('/lastUpdateSame', function (req, res) {
             returnResult.push(update);
             res.end(JSON.stringify(returnResult));
         }
-    })
-});
-
-app.get('/checkauthed', ensureAuthenticated, function (req, res) {
-    User.find({_id:req.session.passport.user},function(err,user){
-        if(err)console.log(err);
-        console.log(user[0].username);
-        //noinspection MagicNumberJS
-        return res.send(user[0].username, 200);
     })
 });
 
@@ -168,6 +147,8 @@ app.get('/lastUpdateSame/:date', function (req, res) {
     });
 
 });
+
+//Logging in and Registration routes
 
 app.post('/logout', function (req, res) {
     req.logout();
@@ -195,57 +176,9 @@ app.post('/auth/login', function (req, res) {
 
 });
 
-app.get('username',ensureAuthenticated,function(req,res){
+
+app.get('username',passport.ensureAuthenticated,function(req,res){
     req.send(req.session.username,200);
-});
-
-app.post('/blog', ensureAuthenticated, function (req, res) {
-    var title = req.body.title;
-    //noinspection JSValidateTypes
-    if (title === '' || title === null || title === undefined)return res.send('need a title', 404);
-    else {
-
-        var newBlogEntry = new Blog(req.body);
-        newBlogEntry.save(function (err) {
-            if (err)console.log(err);
-        });
-        return res.end(JSON.stringify({'success': 'true'}));
-    }
-});
-//edit
-app.post('/blog/:id', ensureAuthenticated, function (req, res) {
-    delete req.body._id;
-    User.findOne({username: req.user[0]._doc.username}, function (err, user) {
-        loggedInUser = user;
-        (loggedInUser);
-        if (user === null) {
-            res.send('error:not an admin account', 401);
-        } else {
-            //take the blog and update it with the new comment
-            //TODO:Highly ineffecient!!! for the network rework this to only have the comment that needs be updated sent and
-            //sorted
-            Blog.findOneAndUpdate({'_id': req.params.id}, req.body, function (err, doc) {
-                if (err) {
-                    console.log(err);
-                    res.end(JSON.stringify({result: 'error'}));
-                }
-                if(doc.comments == undefined || doc.comments.length < 1){
-                    //do nothing for now
-                }else{
-                    doc.comments[0].username = user.username;
-                }
-
-                doc.save(function (err, doc) {
-                    if (err)console.log(err);
-                    res.end(JSON.stringify(doc));
-                });
-                var update = new Update();
-                update.save(function(err,update){if(err)console.log(err);});
-            });
-        }
-
-    });
-
 });
 
 app.post('/register', function (req, res) {
@@ -308,7 +241,10 @@ app.post('/register', function (req, res) {
 
 });
 
-app.post('/addBlogPost', ensureAuthenticated, function (req, res) {
+
+//comment system routes
+
+app.post('/addBlogPost', passport.ensureAuthenticated, function (req, res) {
     var newBlogEntry = new Blog(req.body);
     newBlogEntry.save(function (err) {
         if (err)console.log(err);
@@ -316,7 +252,7 @@ app.post('/addBlogPost', ensureAuthenticated, function (req, res) {
     return res.end(JSON.stringify({'success': 'true'}));
 });
 
-app.post('/comments', ensureAuthenticated, function (req) {
+app.post('/comments', passport.ensureAuthenticated, function (req) {
     Blog.findOne({_id: req.body.id}, function (err, blog) {
         blog.comments.unshift({body: req.body.body, date: Date.now()});
         blog.save(function (err, blog) {
@@ -327,7 +263,9 @@ app.post('/comments', ensureAuthenticated, function (req) {
     })
 });
 
-app.post('/upload', ensureAuthenticated, function (req, res) {
+//file handler routes
+
+app.post('/upload', passport.ensureAuthenticated, function (req, res) {
     var name = req.files.userPhoto.name;
     fs.readFile(req.files.userPhoto.path, function (err, data) {
         var newPath = __dirname + "/public/uploads/" + name;
@@ -337,15 +275,7 @@ app.post('/upload', ensureAuthenticated, function (req, res) {
     });
 });
 
-app.delete('/blog/:id', ensureAuthenticated, function (req) {
-    ('deleted' + req.params.id);
-    Blog.remove({'_id': req.params.id}, function (err) {
-        if (err)
-            console.log(err);
-        update.save(function(err,update){if(err)console.log(err);});
 
-    });
-});
 
 var server = http.createServer(app).listen(app.get('port'), function () {
     console.log("server listening " + app.get('port'));
