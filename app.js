@@ -7,7 +7,11 @@ Object.clone = function (obj) {
 
 var express = require('express')
     , http = require('http')
+    //routes
     , blogRoutes = require('./routes/blog')
+    , authRoutes = require('./routes/auth')
+    , commentRoutes = require('./routes/comments')
+    , fileHandlerRoutes = require('./routes/fileHandler')
     , path = require('path')
     , fs = require('fs')
     , cookie = require('cookie')
@@ -15,11 +19,9 @@ var express = require('express')
     , MemoryStore = express.session.MemoryStore
     , sessionStore = new MemoryStore()
     , q = require('q')
+    //models
     , blogModels = require('./models/models')
     , passport = require('./auth/local').passport_local;
-
-
-
 
 //set up database models to mongoose
 var Blog = blogModels.Blog;
@@ -27,9 +29,8 @@ var User = blogModels.User;
 var Update = blogModels.Update;
 
 var app = express();
+
 //noinspection JSValidateTypes
-
-
 app.configure(function () {
     //noinspection JSUnresolvedVariable,JSValidateTypes,MagicNumberJS
     app.set('port', process.env.PORT || 3000);
@@ -94,186 +95,42 @@ app.post('/blog/:id', passport.ensureAuthenticated, blogRoutes.updateBlog);
 
 app.delete('/blog/:id', passport.ensureAuthenticated, blogRoutes.deleteBlog);
 
+app.post('/addBlogPost', passport.ensureAuthenticated, blogRoutes.addBlogEntry);
 //Auth Routes
 
-app.get('/checkauthed', passport.ensureAuthenticated, function (req, res) {
-    User.find({_id:req.session.passport.user},function(err,user){
-        if(err)console.log(err);
-        console.log(user[0].username);
-        //noinspection MagicNumberJS
-        return res.send(user[0].username, 200);
-    })
-});
-
+app.get('/checkauthed', passport.ensureAuthenticated, authRoutes.checkAuthed);
 
 //Update docs routes
+app.get('/lastUpdateSame', authRoutes.lastUpdateSame);
 
-app.get('/lastUpdateSame', function (req, res) {
-    Update.findOne({}).lean().exec(function (err, update) {
-        var returnResult = [];
-        if (err)(err);
-        if (update == null) {
-            var updateCreate = new Update();
-            updateCreate.save(function (err, newUpdate) {
-                if (err)console.log(err);
-                returnResult.push(newUpdate);
-                res.end(JSON.stringify(returnResult));
-            });
-        } else {
-            returnResult.push(update);
-            res.end(JSON.stringify(returnResult));
-        }
-    })
-});
-
-app.get('/lastUpdateSame/:date', function (req, res) {
-    var dateFromClient = req.params.date;
-    var response = [];
-
-    Update.findOne({}, function (err, update) {
-        var obj = {};
-        if (update == null) {
-            obj.result = "false";
-        } else {
-            if (dateFromClient == update.lastUpdate.getTime()) {
-                obj.result = "false";
-            } else {
-                obj.lastUpdate = update.lastUpdate;
-                obj.result = "true";
-            }
-        }
-        response.push(obj);
-        return res.end(JSON.stringify(response));
-    });
-
-});
+app.get('/lastUpdateSame/:date', authRoutes.lastUpdateSameId);
 
 //Logging in and Registration routes
 
-app.post('/logout', function (req, res) {
-    req.logout();
-    //noinspection MagicNumberJS
-    res.send('loggedout', 410);
-});
+app.post('/logout', authRoutes.logout);
 
 app.post('/login',
     passport.authenticate('local'),
     function (req, res) {
         res.send('authed', 200);
     });
-//for admin side
-app.post('/auth/login', function (req, res) {
-    User.findOne({'username': req.body.username, 'password': req.body.password,admin:{$in:['superuser','admin']}}, function (err, administrator) {
-        if (err)console.log(err);
-        if (administrator) {
-            req.session.loggedIn = true;
-        } else {
-            req.session.loggedIn = false;
-        }
 
-        return res.send(200);
-    });
-
-});
-
+app.post('/auth/login',authRoutes.loginAuth);
 
 app.get('username',passport.ensureAuthenticated,function(req,res){
     req.send(req.session.username,200);
 });
 
-app.post('/register', function (req, res) {
-    var userCount = 0,
-        adminCount = 0,
-        username = req.body.username,
-        password = req.body.password,
-        minUsernameLength = 5,
-        maxUsernameLength = 16,
-        minPasswordLength = 5,
-        maxPasswordLength = 16;
-
-    User.count({username: username}, function (err, count) {
-        if (err)console.log(err);
-        userCount = count;
-        //then get admin count
-        User.count({username: username,admin :{$in:['superuser','admin']}} , function (err, count) {
-            if (err)console.log(err);
-            adminCount = count;
-            //then check count
-            //TODO:redo this section of code in promises
-            //username checks
-            if (userCount < 1 && adminCount < 1 && username != undefined && username != "" && username.length > minUsernameLength && username.length < maxUsernameLength &&
-                //password checks
-                password != undefined && password.length > minPasswordLength && password.length < maxPasswordLength && password != username) {
-                var user = new User(req.body);
-                user.save(function (err) {
-                    if (err)console.log(err);
-                });
-                return res.end(JSON.stringify({'success': 'true'}));
-            } else {
-                var errorMessage = "";
-                if (password == undefined) {
-                    password = "";
-                }
-                if (username == undefined || username == "") {
-                    errorMessage = 'Please enter a username';
-                } else if (username.length < minUsernameLength) {
-                    errorMessage = 'Username must be longer than ' + minUsernameLength;
-                } else if (username.length > maxUsernameLength) {
-                    errorMessage = 'Username must be shorter than ' + maxUsernameLength;
-                } else if (password.length < minPasswordLength) {
-                    errorMessage = 'Password must be longer than ' + minPasswordLength;
-                } else if (password.length > maxPasswordLength) {
-                    errorMessage = 'Password must be shorter than ' + maxPasswordLength;
-                } else if (password == username) {
-                    errorMessage = 'Password can not be the same as username';
-                }
-                if (userCount >= 1 || adminCount >= 1) {
-                    errorMessage = 'username already taken';
-                }
-                if (errorMessage == "") {
-                    errorMessage = 'unknown error';
-                }
-                return res.end(JSON.stringify({'fail': errorMessage}));
-            }
-        });
-    });
-
-
-});
-
+app.post('/register',authRoutes.register);
 
 //comment system routes
 
-app.post('/addBlogPost', passport.ensureAuthenticated, function (req, res) {
-    var newBlogEntry = new Blog(req.body);
-    newBlogEntry.save(function (err) {
-        if (err)console.log(err);
-    });
-    return res.end(JSON.stringify({'success': 'true'}));
-});
 
-app.post('/comments', passport.ensureAuthenticated, function (req) {
-    Blog.findOne({_id: req.body.id}, function (err, blog) {
-        blog.comments.unshift({body: req.body.body, date: Date.now()});
-        blog.save(function (err, blog) {
-            if (err)console.log(err);
-            var update = new Update();
-            update.save(function(err,update){if(err)console.log(err);});
-        })
-    })
-});
+app.post('/comments', passport.ensureAuthenticated, commentRoutes.comments);
 
 //file handler routes
 
-app.post('/upload', passport.ensureAuthenticated, function (req, res) {
-    var name = req.files.userPhoto.name;
-    fs.readFile(req.files.userPhoto.path, function (err, data) {
-        var newPath = __dirname + "/public/uploads/" + name;
-        fs.writeFile(newPath, data, function (err) {
-            res.redirect("back");
-        });
-    });
-});
+app.post('/upload', passport.ensureAuthenticated, fileHandlerRoutes.upload);
 
 
 
@@ -283,6 +140,7 @@ var server = http.createServer(app).listen(app.get('port'), function () {
 var io = require('socket.io').listen(server);
 
 //************SOCKET.IO**************************//
+// TODO:fix chat bug where same user name of user shows twice.
 
 io.configure(function () {
     io.set("authorization", passportSocketIo.authorize({

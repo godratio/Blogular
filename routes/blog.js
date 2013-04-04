@@ -76,3 +76,11 @@ exports.deleteBlog = function(req,res){
 
     });
 }
+
+exports.addBlogEntry = function(req,res){
+    var newBlogEntry = new Blog(req.body);
+    newBlogEntry.save(function (err) {
+        if (err)console.log(err);
+    });
+    return res.end(JSON.stringify({'success': 'true'}));
+}
