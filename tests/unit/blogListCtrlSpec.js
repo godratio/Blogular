@@ -1,8 +1,12 @@
 describe('BlogListCtrl test: ', function () {
-    beforeEach(module('blogResource'));
-    var scope, ctrl, $httpBackend;
-    beforeEach(inject(function (_$httpBackend_, $rootScope, $controller) {
-        $httpBackend = _$httpBackend_;
+    beforeEach(module('Plugin.Controller.BlogEntries'));
+    beforeEach(module('blogApp'));
+    var scope, ctrl;
+    beforeEach(inject(function ($httpBackend, $rootScope, $controller) {
+        $httpBackend.expectGET('/lastUpdateSame').
+            respond([
+
+            ]);
         $httpBackend.expectGET('/blog').
             respond([
                 {title: 'Got'},
@@ -10,15 +14,15 @@ describe('BlogListCtrl test: ', function () {
             ]);
 
         scope = $rootScope.$new();
-        ctrl = $controller(ContentCtrl, {$scope: scope});
+        ctrl = $controller('ContentCtrl', {$scope: scope});
         $httpBackend.flush();
     }));
 
-    it('should create "phones" model with 2 phones fetched from xhr', function () {
+    it('should respond with Got', function () {
         expect(scope.entries[0].title).toEqual('Got');
     });
 })
-
+/*
 describe('blogEntryCtrl test: ', function () {
     beforeEach(module('blogResource'));
     var scope, ctrl, $httpBackend;
@@ -51,4 +55,4 @@ describe('blogResource test', function () {
     });
 
 });
-
+ */

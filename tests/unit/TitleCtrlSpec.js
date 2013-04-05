@@ -7,12 +7,11 @@
  */
 describe('TitleCtrl', function () {
     var scope, ctrl;
-
-
-    beforeEach(inject(function (_$httpBackend_, $rootScope, $controller) {
+    beforeEach(module('Plugin.Controller.Title'));
+    beforeEach(inject(function ($httpBackend, $rootScope, $controller) {
         scope = $rootScope.$new();
-        //ctrl = $controller(TitleCtrl, {$scope: scope});
-        ctrl = new TitleCtrl(scope);
+        ctrl = $controller('TitleCtrl', {$scope: scope});
+        //ctrl = new TitleCtrl(scope);
     }));
 
     it('should absolutely have a title', function () {

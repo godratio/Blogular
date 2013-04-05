@@ -8,17 +8,22 @@ basePath = '../';
 
 // list of files / patterns to load in the browser
 files = [
-  JASMINE,
-  JASMINE_ADAPTER,
- 'public/javascripts/angular/angular.js',
- //'public/javascripts/app/angular-*.js',
-  'public/javascripts/angular/angular-mocks.js',
- //'public/javascripts/external/blogService.js',
- //'public/javascripts/app/*.js',
-//'public/javascripts/external/*.js',
-'public/javascripts/external/GlobalCtrls/TitleCtrl.js',
-  'tests/unit/controllerSpec.js',
-  'tests/unit/TitleCtrlSpec.js'
+    JASMINE,
+    JASMINE_ADAPTER,
+    'public/javascripts/angular/angular.js',
+    // 'public/javascripts/angular/angular-*.js',
+    'public/javascripts/angular/angular-resource.js',
+    'public/javascripts/angular/angular-mocks.js',
+    'public/javascripts/external/scope.onready.js',
+    'public/javascripts/app/*.js',
+    'public/javascripts/external/*/*.js',
+    'public/javascripts/external/angular-http-auth.js',
+    'public/javascripts/external/socketmodule.js',
+
+
+    'tests/unit/controllerSpec.js',
+    'tests/unit/TitleCtrlSpec.js' ,
+    'tests/unit/blogListCtrlSpec.js'
 
 ];
 
