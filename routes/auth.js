@@ -1,7 +1,7 @@
 var models = require('../models/models');
 var Blog = models.Blog;
 var User = models.User;
-var update = models.Update;
+var Update = models.Update;
 
 exports.checkAuthed = function (req, res) {
     User.find({_id:req.session.passport.user},function(err,user){

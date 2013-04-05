@@ -10,9 +10,9 @@ basePath = '../';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
- 'public/javascripts/app/angular.js',
+ 'public/javascripts/angular/angular.js',
  //'public/javascripts/app/angular-*.js',
-  'public/javascripts/app/angular-mocks.js',
+  'public/javascripts/angular/angular-mocks.js',
  //'public/javascripts/external/blogService.js',
  //'public/javascripts/app/*.js',
 //'public/javascripts/external/*.js',
@@ -25,7 +25,7 @@ files = [
 
 // list of files to exclude
 exclude = [
-  
+
 ];
 
 
@@ -63,8 +63,8 @@ autoWatch = false;
 // - Safari (only Mac)
 // - PhantomJS
 // - IE (only Windows)
-browsers = ['C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'];
-
+//browsers = ['C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'];
+browsers = ['Chrome'];
 
 // If browser does not capture in given timeout [ms], kill it
 captureTimeout = 5000;
@@ -72,4 +72,4 @@ captureTimeout = 5000;
 
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit
-singleRun = false;
+singleRun = true;

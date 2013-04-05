@@ -10,8 +10,6 @@ describe('TitleCtrl', function () {
 
 
     beforeEach(inject(function (_$httpBackend_, $rootScope, $controller) {
-
-
         scope = $rootScope.$new();
         //ctrl = $controller(TitleCtrl, {$scope: scope});
         ctrl = new TitleCtrl(scope);
