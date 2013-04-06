@@ -116,7 +116,7 @@ app.service('userInfoService', function () {
             return username;
         },
         setUsername: function (value) {
-            username.username = value;
+            username = value;
         }
     }
 });

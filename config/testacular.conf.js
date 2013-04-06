@@ -11,6 +11,8 @@ files = [
     JASMINE,
     JASMINE_ADAPTER,
     'public/javascripts/angular/angular.js',
+    'node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js',
+
     // 'public/javascripts/angular/angular-*.js',
     'public/javascripts/angular/angular-resource.js',
     'public/javascripts/angular/angular-mocks.js',
@@ -19,11 +21,7 @@ files = [
     'public/javascripts/external/*/*.js',
     'public/javascripts/external/angular-http-auth.js',
     'public/javascripts/external/socketmodule.js',
-
-
-    'tests/unit/controllerSpec.js',
-    'tests/unit/TitleCtrlSpec.js' ,
-    'tests/unit/blogListCtrlSpec.js'
+    'tests/unit/*.js',
 
 ];
 

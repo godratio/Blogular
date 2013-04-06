@@ -1,3 +1,4 @@
+
 angular.module('socketio', []).
     factory('socket', function ($rootScope) {
         var socket = io.connect('', {
