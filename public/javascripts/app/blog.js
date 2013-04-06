@@ -1,4 +1,4 @@
-var app = angular.module('blogApp', ['twitterService','userService', 'http-auth-interceptor', 'login', 'socketio', 'updateService', 'Scope.onReady', 'blogResource', 'loaderModule', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries', 'blogFilter']).
+var app = angular.module('blogApp', ['twitterService', 'userService', 'http-auth-interceptor', 'login', 'socketio', 'updateService', 'Scope.onReady', 'blogResource', 'loaderModule', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries', 'blogFilter']).
     config(function ($routeProvider) {
         $routeProvider.
             when("/", {templateUrl: "partials/blog.html"}).
@@ -125,8 +125,8 @@ app.controller('blogViewCtrl', function ($scope, show, categoryService, BlogsSer
     $scope.show = show;
 });
 //TODO:add a simple twitter feed here
-app.controller('TwitterCtrl',function ($scope, Blog,Twitter,$routeParams) {
-    $scope.twitterResult =  Twitter.get();
+app.controller('TwitterCtrl', function ($scope, Blog, Twitter, $routeParams) {
+    $scope.twitterResult = Twitter.get();
     console.log("Twitter result");
     console.log($scope.twitterResult);
 });
@@ -138,6 +138,8 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     socket.connect();
     $scope.entry = "";
     $scope.viewers = [];
+    $scope.entry.comments = [];
+
     console.log("angular subscribing");
     socket.emit('subscribe', {room: $routeParams.id});
     socket.on('login', function () {
@@ -177,26 +179,7 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
         });
     });
     $scope.submitComment = function () {
-        /*
-         BlogsService.postComment({body:$scope.body,id:$scope.entry._id},function(blog){
-         //console.log(blog.comments);
-         $scope.comments = blog.comments;
-         });
-         */
-
-        if ($scope.entry.comments == undefined) {
-            //noinspection JSPrimitiveTypeWrapperUsage
-            $scope.entry.comments = [];
-            $scope.entry.comments.unshift({body: $scope.body, date: Date.now()});
-        } else {
-            var buffer = [];
-            angular.copy($scope.comments, buffer);
-            console.log(buffer);
-            buffer.unshift({body: $scope.body, date: Date.now()});
-            //noinspection JSPrimitiveTypeWrapperUsage
-            $scope.entry.comments = buffer;
-            // blog.comments.push({body:$scope.body,data:Date.now()});
-        }
+        $scope.entry.comments.unshift({body: $scope.body, date: Date.now()});
         $scope.entry.$save(function (blog) {
             console.log("saved");
             $scope.comments = blog.comments;
@@ -204,7 +187,6 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
 //            $scope.comments = BlogsService.getCommentsForBlogEntry($routeParams.id);
             socket.emit('sentcomment', {room: $routeParams.id});
         });
-
     };
     show.state = true;
     $scope.show = show;
@@ -247,9 +229,9 @@ app.controller('LoginController', function ($scope, $http, authService, userInfo
         console.log($scope.form);
         $http.post('/login', $scope.form)
             .success(function (data, status) {
-                console.log('logged in with status '+status);
+                console.log('logged in with status ' + status);
                 console.log(data);
-                console.log('setting username '+$scope.form.username);
+                console.log('setting username ' + $scope.form.username);
                 userInfoService.setUsername($scope.form.username);
                 $scope.userinfo = $scope.form;
                 $scope.form.username = "";

@@ -24,6 +24,7 @@ angular.module('blogService', ['ngResource']).
                         console.log("errorbeforcallback");
                         categories.length = 0;
                         for (var i = 0; i < blogs.length; i++) {
+                            if(blogs[i].categories === undefined){continue}
                             for (var x = 0; x < blogs[i].categories.length; x++) {
                                 var name = blogs[i].categories[x].name;
                                 var added = false;
@@ -57,15 +58,16 @@ angular.module('blogService', ['ngResource']).
                 return categories;
             },
             getAllBlogs: function (callback) {
+                console.log('getallblogs called')
                 if (allBlogs.length > 0) {
-                    // console.log(callback);
+                    console.log('first option');
                     if (typeof callback == 'function') {
                         callback(allBlogs);
                     }
                     //return allBlogs;
                 } else {
                     this.getBlogs(function (blogs) {
-
+                         console.log('getting all blogs from getAllBlogs')
                         callback(blogs);
                     })
                 }

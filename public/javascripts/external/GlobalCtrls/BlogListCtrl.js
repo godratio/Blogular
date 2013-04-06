@@ -16,6 +16,7 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
             UpdateService.checkIfUpdate(function (result) {
                 console.log(result);
                 if (result) {
+                    //get all the blogs from server:ie this is first init
                     BlogsService.getBlogs(function (blogs) {
                         $scope.entries = blogs;
 
@@ -27,6 +28,7 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
                         chopBlogText();
                     });
                 } else {
+                    //if we dont have any updates just show from cache
                     //**********how to encapsulate in angular??************//
                     BlogsService.getAllBlogs(function (blogs) {
                         $scope.entries = blogs;
@@ -45,7 +47,6 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
                 BlogsService.getAllBlogs(function (blogs) {
                     $scope.entries = blogs;
                     $scope.categories = BlogsService.getCategories();
-                    console.log($scope.categories);
                     $scope.$onReady("success");
                     chopBlogText();
                 });
@@ -66,7 +67,7 @@ angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService',
              }
          }
 
-        function chopText(txt,no){return txt.substring(0,no);}
+        function chopText(txt,no){return txt == undefined ? null : txt.substring(0,no);}
 
 
     });
