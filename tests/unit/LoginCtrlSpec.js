@@ -4,7 +4,7 @@ describe('LoginCtrl tests: ',function(){
     beforeEach(inject(function ($rootScope, $controller, $routeParams, $injector) {
         $httpBackend = $injector.get('$httpBackend');
 
-        $httpBackend.when('GET', '/login')
+        $httpBackend.when('POST', '/login')
             .respond(
                 [
                     {title: 'Got', author: 'Ray Garner', categories: [
@@ -13,7 +13,9 @@ describe('LoginCtrl tests: ',function(){
                 ]
             );
 
+
         scope = $rootScope.$new();
+        scope.form = {};
         //nofilter tag so this will be all blogs
         //scope.entries = [{title:"Got"}];
 
@@ -23,12 +25,23 @@ describe('LoginCtrl tests: ',function(){
         $httpBackend.verifyNoOutstandingExpectation();
         $httpBackend.verifyNoOutstandingRequest();
     });
+    it('should set login attempt to true',function(){
+        scope.form.username = "test";
 
-    it('should check server for credentials if login attempted',function(){
         scope.submitAuth();
+        console.log(scope.loginAttempt);
+        $httpBackend.flush();
+        expect(scope.loginAttempt).toBeTruthy();
+    });
+    it('should check server for credentials if login attempted',function(){
+        $httpBackend.expectPOST('/login').
+            respond(200);
+        scope.submitAuth();
+        $httpBackend.flush();
+        expect(scope.form.username).toBe("");
+        expect(scope.form.password).toBe("");
 
-
-    })
+    });
 
 
 })

@@ -229,15 +229,9 @@ app.controller('LoginController', function ($scope, $http, authService, userInfo
         console.log($scope.form);
         $http.post('/login', $scope.form)
             .success(function (data, status) {
-                console.log('logged in with status ' + status);
-                console.log(data);
-                console.log('setting username ' + $scope.form.username);
                 userInfoService.setUsername($scope.form.username);
-                $scope.userinfo = $scope.form;
                 $scope.form.username = "";
                 $scope.form.password = "";
-
-
                 authService.loginConfirmed();
                 window.location.reload();
             }).error(function (data, status) {
@@ -282,6 +276,7 @@ app.controller('RegisterCtrl', function ($scope, $http, $rootScope) {
             success(function (data) {
                 console.log(data);
                 if (data.fail) {
+                    console.log(data.fail);
                     $scope.message = data.fail;
                 } else {
                     $scope.form = {};
@@ -305,6 +300,7 @@ app.controller('UserInfoCtrl', function ($scope, userInfoService, $http) {
                 console.log("error on logout??")
             })
     };
+    //waiting for a 410 from the authorizer service
     $scope.$on('event:auth-loggedOut', function (event) {
         //userInfoService.setUsername("Guest");
         $scope.username = "Guest";
