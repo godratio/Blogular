@@ -18,6 +18,13 @@ exports.getABlog = function(req,res){
         return res.end(JSON.stringify(post));
     });
 }
+//TODO:verify and test this functionality.
+exports.getLastBlogUpdateDate = function(req,res){
+    var id = req.params.id;
+    Blog.find({'_id': id}).lean().exec(function (err, post) {
+        return res.end(JSON.stringify(post.updateDate));
+    });
+}
 
 exports.createBlog = function(req,res){
     var title = req.body.title;
@@ -34,6 +41,8 @@ exports.createBlog = function(req,res){
 }
 
 exports.updateBlog = function(req,res){
+    //Updates whatever blog is sent to it
+    //break this up into updateBlog and updateComment/addComment
     delete req.body._id;
     User.findOne({username: req.user[0]._doc.username}, function (err, user) {
         loggedInUser = user;
@@ -51,6 +60,7 @@ exports.updateBlog = function(req,res){
                 }
                 if(doc.comments == undefined || doc.comments.length < 1){
                     //do nothing for now
+                    doc.updateDate = Date.now();
                 }else{
                     doc.comments[0].username = user.username;
                 }

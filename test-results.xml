@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<testsuites>
+  <testsuite name="Chrome 26.0 (Mac)" package="" timestamp="2013-04-08T13:43:55" id="0" hostname="Rays-MacBook-Pro.local" tests="22" errors="0" failures="0" time="0.287">
+    <properties>
+      <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31"/>
+    </properties>
+    <testcase name="should set login attempt to true" time="0.231" classname="Chrome 26.0 (Mac).LoginCtrl tests: "/>
+    <testcase name="should check server for credentials if login attempted" time="0.003" classname="Chrome 26.0 (Mac).LoginCtrl tests: "/>
+    <testcase name="should submit registration" time="0.002" classname="Chrome 26.0 (Mac).RegisterCtrl tests: "/>
+    <testcase name="should set message upon failure of registration" time="0.001" classname="Chrome 26.0 (Mac).RegisterCtrl tests: "/>
+    <testcase name="should set message upon total failure of request" time="0.003" classname="Chrome 26.0 (Mac).RegisterCtrl tests: "/>
+    <testcase name="should absolutely have a title" time="0.001" classname="Chrome 26.0 (Mac).TitleCtrl"/>
+    <testcase name="should set username on init" time="0.003" classname="Chrome 26.0 (Mac).UserInfoCtrlSpec tests: "/>
+    <testcase name="should attempt to logout on call of logout function" time="0.004" classname="Chrome 26.0 (Mac).UserInfoCtrlSpec tests: "/>
+    <testcase name="should create &quot;blog&quot; model fetched from xhr" time="0.008" classname="Chrome 26.0 (Mac).blogEntryCtrl test: "/>
+    <testcase name="should properly submit comment" time="0.004" classname="Chrome 26.0 (Mac).blogEntryCtrl test: "/>
+    <testcase name="filterTag should be undefined " time="0.005" classname="Chrome 26.0 (Mac).BlogListCtrl test: without filter "/>
+    <testcase name="should call getEntries and entries should be loaded if any" time="0.003" classname="Chrome 26.0 (Mac).BlogListCtrl test: without filter "/>
+    <testcase name="filterTag should be defined " time="0.003" classname="Chrome 26.0 (Mac).BlogListCtrl test: with filter  lastupdate false"/>
+    <testcase name="should call getEntries and entries should be loaded if any" time="0.004" classname="Chrome 26.0 (Mac).BlogListCtrl test: with filter  lastupdate false"/>
+    <testcase name="filterTag should be defined " time="0.003" classname="Chrome 26.0 (Mac).BlogListCtrl test: with filter  lastupdate true"/>
+    <testcase name="should call getEntries and entries should be loaded if any" time="0.002" classname="Chrome 26.0 (Mac).BlogListCtrl test: with filter  lastupdate true"/>
+    <testcase name="should get categories and assign them to categories on scope" time="0.002" classname="Chrome 26.0 (Mac).BlogViewCtrl tests: "/>
+    <testcase name="should be a valid test" time="0" classname="Chrome 26.0 (Mac).testsuite"/>
+    <testcase name="should be initialized as false" time="0.001" classname="Chrome 26.0 (Mac).showFactory Test: "/>
+    <testcase name="should change to true if change to... true" time="0.001" classname="Chrome 26.0 (Mac).showFactory Test: "/>
+    <testcase name="initailizes a username to Guest and can get that username" time="0.002" classname="Chrome 26.0 (Mac).UserInfoService tests:"/>
+    <testcase name="sets a username" time="0.001" classname="Chrome 26.0 (Mac).UserInfoService tests:"/>
+    <system-out><![CDATA[Chrome 26.0 (Mac) LOG: { status: 41, config: { method: 'POST', url: '/register' } }
+,Chrome 26.0 (Mac) LOG: { status: 41, config: { method: 'POST', url: '/register' } }
+,Chrome 26.0 (Mac) LOG: { status: 41, config: { method: 'POST', url: '/register' } }
+
+]]></system-out>
+    <system-err/>
+  </testsuite>
+</testsuites>

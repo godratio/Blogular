@@ -5,7 +5,7 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-var appAdmin = angular.module('blogAppAdmin', ['userService', 'login', 'ngCookies', 'loaderModule', 'blogResource', 'adminResource', 'http-auth-interceptor', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries']).
+var appAdmin = angular.module('blogAppAdmin', ['blogService','userService', 'login', 'ngCookies', 'loaderModule', 'blogResource', 'adminResource', 'http-auth-interceptor', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries']).
     config(function ($routeProvider) {
         $routeProvider.
             when("/", {templateUrl: "partials/admin/blogList.html"}).
@@ -59,31 +59,24 @@ appAdmin.controller('LoginController', function ($scope, Admin, authService, $ht
         }
     }
 );
-appAdmin.controller('AddBlogCtrl', function ($scope, Blog, $location, $cookies) {
-
+appAdmin.controller('AddBlogCtrl', function ($scope, BlogsService, Blog, $location, $cookies) {
     $scope.submitPost = function () {
-        console.log($scope.form);
         var categories = $scope.form.categories.split(',');
         var bufferArr = [];
         angular.forEach(categories, function (value) {
             var bufferObj = {name: value};
             bufferArr.push(bufferObj);
         });
-        //angular.copy(bufferArr,$scope.form.categories);
         $scope.form.categories = bufferArr;
-        var b = new Blog($scope.form);
-        console.log(b);
-        b.$save(function () {
-                $scope.form.title = "";
-                $scope.form.author = "";
-                $scope.form.text = "";
-                $scope.message = "";
-            },
-            function (err) {
-                console.log("error", err);
+        BlogsService.updateBlog($scope.form,function(err){
+            if(err){
                 $scope.message = "Blog entry must have a title.";
-            });
-        console.log($cookies.loggedIn);
+            }
+            $scope.form.title = "";
+            $scope.form.author = "";
+            $scope.form.text = "";
+            $scope.message = "";
+        });
     }
 });
 

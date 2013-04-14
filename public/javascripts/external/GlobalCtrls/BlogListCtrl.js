@@ -7,14 +7,11 @@
  */
 angular.module('Plugin.Controller.BlogEntries', ['updateService', 'blogService', 'Scope.onReady'])
     .controller('ContentCtrl', function ($scope, show, Blog, BlogsService, $q, $routeParams, UpdateService) {
-        console.log($routeParams.name + "parname");
         $scope.$prepareForReady();
         $scope.filterTag = $routeParams.name;
         //check if user wants to see blogs by categories or not
         if ($routeParams.name) {
-            console.log("error?");
             UpdateService.checkIfUpdate(function (result) {
-                console.log(result);
                 if (result) {
                     //get all the blogs from server:ie this is first init
                     BlogsService.getBlogs(function (blogs) {

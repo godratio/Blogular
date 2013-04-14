@@ -7,49 +7,55 @@ angular.module('blogService', ['ngResource']).
                 'save': {method: 'POST'}
             }
         );
-        $resource('/comments',
+        var commentsResource = $resource('/comments',
             {id: '@_id'},
             {
                 'get': {method: 'GET', isArray: 'true'},
                 'save': {method: 'POST'}
             }
         );
+        var blogPagination = $resource('/blog/:skip/:limit',
+            {skip:'0',limit:'3'},
+            {'get':{method:'GET',isArray:'true'}
+            });
         var categories = [];
         var allBlogs = [];
+        var processBlogs = function(blogs){
+            console.log(categories);
+            categories.length = 0;
+            for (var i = 0; i < blogs.length; i++) {
+                if(blogs[i].categories === undefined){continue}
+                for (var x = 0; x < blogs[i].categories.length; x++) {
+                    var name = blogs[i].categories[x].name;
+                    var added = false;
+                    if (categories.length == 0) {
+                        categories.push({name: name, count: 1});
+                        added = true;
+                    }
+                    if (added == false) {
+                        for (var y = 0; y < categories.length; y++) {
+                            var buffername = categories[y].name;
+                            var buffercount = categories[y].count;
+                            if (buffername == name) {
+                                categories[y].count = ++buffercount;
+                                added = true;
+                            }
+                        }
+                    }
+                    if (added == false) {
+                        categories.push({name: name, count: 1});
+                    }
+                }
+            }
+            allBlogs = blogs;
+            return blogs;
+
+        }
         var BlogsService = {
             getBlogs: function (callback) {
                 var deferred = $q.defer();
-                console.log("the errori shere ??");
                 blogResource.get(function (blogs) {
-                        console.log("errorbeforcallback");
-                        categories.length = 0;
-                        for (var i = 0; i < blogs.length; i++) {
-                            if(blogs[i].categories === undefined){continue}
-                            for (var x = 0; x < blogs[i].categories.length; x++) {
-                                var name = blogs[i].categories[x].name;
-                                var added = false;
-                                if (categories.length == 0) {
-                                    categories.push({name: name, count: 1});
-                                    added = true;
-                                }
-                                if (added == false) {
-                                    for (var y = 0; y < categories.length; y++) {
-                                        var buffername = categories[y].name;
-                                        var buffercount = categories[y].count;
-                                        if (buffername == name) {
-                                            categories[y].count = ++buffercount;
-                                            added = true;
-                                        }
-                                    }
-                                }
-                                if (added == false) {
-                                    categories.push({name: name, count: 1});
-                                }
-                            }
-                        }
-                        allBlogs = blogs;
-
-                        callback(blogs);
+                        callback(processBlogs(blogs));
                     },
                     function () {
                     });
@@ -58,16 +64,13 @@ angular.module('blogService', ['ngResource']).
                 return categories;
             },
             getAllBlogs: function (callback) {
-                console.log('getallblogs called')
                 if (allBlogs.length > 0) {
-                    console.log('first option');
                     if (typeof callback == 'function') {
                         callback(allBlogs);
                     }
                     //return allBlogs;
                 } else {
                     this.getBlogs(function (blogs) {
-                         console.log('getting all blogs from getAllBlogs')
                         callback(blogs);
                     })
                 }
@@ -78,9 +81,7 @@ angular.module('blogService', ['ngResource']).
                 var buffer = [];
                 angular.copy(allBlogs, buffer);
                 for (var x = 0; x < allBlogs.length; x++) {
-                    //console.log(buffer[x].categories);
                     for (var i = 0; i < allBlogs[x].categories.length; i++) {
-                        console.log(allBlogs[x].categories[i]);
                         if (allBlogs[x].categories[i].name === tag) {
                             buffer.push(allBlogs[x]);
                         }
@@ -90,15 +91,36 @@ angular.module('blogService', ['ngResource']).
                 return buffer;
             },
             getCommentsForBlogEntry: function (id) {
-                //console.log(allBlogs);
                 for (var i = 0; i < allBlogs.length; i++) {
-                    // console.log("blogid = "+allBlogs[i]._id + " id = "+id);
                     if (allBlogs[i]._id == id) {
-                        // console.log(allBlogs[i]);
                         return allBlogs[i].comments;
                     }
                 }
+            },
+            //check cache for Blog Entry
+            getBlogFromLocal:function(id,callback){
+                for (var i = 0; i < allBlogs.length; i++) {
+                    if (allBlogs[i]._id == id) {
+                        callback(allBlogs[i]);
+                    }
+                }
+            },
+            updateBlog:function(form,callback){
+                var b = new blogResource(form);
+                b.$save(function () {
+                        callback();
+                    },
+                    function (err) {
+                        callback(err);
+                    });
+            },
+            paginatedBlogs:function(skip,limit,callback){
+                blogPagination.get({skip:skip,limit:limit},function(blogs){
+                    console.log(blogs);
+                    callback(processBlogs(blogs));
+                })
             }
+
             /*,TODO:why won allBlogs be the current value of comments ????
 
              postComment:function(params,callback){

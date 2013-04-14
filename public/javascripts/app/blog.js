@@ -1,4 +1,8 @@
-var app = angular.module('blogApp', ['twitterService', 'userService', 'http-auth-interceptor', 'login', 'socketio', 'updateService', 'Scope.onReady', 'blogResource', 'loaderModule', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries', 'blogFilter']).
+var app = angular.module('blogApp', [
+        'twitterService', 'userService', 'http-auth-interceptor', 'login', 'socketio', 'updateService',
+        'Scope.onReady', 'blogResource', 'loaderModule', 'Plugin.Controller.Title', 'Plugin.Controller.BlogEntries',
+        'blogFilter','blogService'
+    ]).
     config(function ($routeProvider) {
         $routeProvider.
             when("/", {templateUrl: "partials/blog.html"}).
@@ -13,13 +17,9 @@ var app = angular.module('blogApp', ['twitterService', 'userService', 'http-auth
 app.directive('becomeMainContent', function () {
     return {
         link: function (scope, ele) {
-            //iele.animate({width:900});
-            console.log("directive called");
 
             scope.$whenReady(
                 function () { //called when $scope.$onReady() is run
-                    console.log("called when ready");
-                    //ele.html('your data was loaded fine');
                     ele.removeClass("nine");
                     ele.addClass("twelve");
                 },
@@ -31,19 +31,15 @@ app.directive('becomeMainContent', function () {
         }
     }
 });
+
 app.directive('revealModal', function () {
     return {
         link: function (scope, elm, attrs) {
-            console.log('show-modal directive called');
-            console.log(attrs);
-
-
             scope.$on('event:auth-loginConfirmed', function (event) {
                 console.log("EVENT TRIGGERED" + event);
                 if (attrs.revealModal == 'login') {
                     elm.trigger('reveal:close');
                 } else {
-                    //elm.show();
                 }
             });
             scope.$on('event:auth-registered', function () {
@@ -55,8 +51,6 @@ app.directive('revealModal', function () {
                     elm.reveal();
                 }
             });
-
-
         }
     }
 });
@@ -64,7 +58,6 @@ app.directive('revealModal', function () {
 app.directive('ifAuthed', function ($http) {
     return {
         link: function (scope, elm, attrs) {
-            console.log('hideIfAuthedCalled');
             $http.get('/checkauthed').then(function (data) {
                 scope.username = data.data;
                 if (attrs.ifAuthed == 'show') {
@@ -74,7 +67,6 @@ app.directive('ifAuthed', function ($http) {
                 }
             });
             scope.$on('event:auth-loginConfirmed', function (event) {
-                console.log(event);
                 if (attrs.ifAuthed == 'show') {
                     elm.show();
                 } else {
@@ -82,7 +74,6 @@ app.directive('ifAuthed', function ($http) {
                 }
             });
             scope.$on('event:auth-loggedOut', function (event) {
-                console.log(event);
                 if (attrs.ifAuthed == 'show') {
                     elm.hide();
                 } else {
@@ -100,19 +91,21 @@ app.directive('ifAuthed', function ($http) {
         }
     }
 });
+
 app.factory('show', function () {
     return {state: false};
 });
+
 app.factory('categoryService', function () {
     return [
         {name: 'test'}
     ];
 });
+
 app.service('userInfoService', function () {
     var username = "Guest";
     return {
         getUsername: function () {
-            console.log(username);
             return username;
         },
         setUsername: function (value) {
@@ -120,34 +113,23 @@ app.service('userInfoService', function () {
         }
     }
 });
+
 app.controller('blogViewCtrl', function ($scope, show, categoryService, BlogsService) {
     $scope.categories = BlogsService.getCategories();
     $scope.show = show;
 });
-//TODO:add a simple twitter feed here
-app.controller('TwitterCtrl', function ($scope, Blog, Twitter, $routeParams) {
-    $scope.twitterResult = Twitter.get();
-    console.log("Twitter result");
-    console.log($scope.twitterResult);
-});
 
-var AboutCtrl = function ($scope, $http) {
-};
-
-app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, socket) {
+app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, socket,BlogsService) {
     socket.connect();
     $scope.entry = "";
     $scope.viewers = [];
     $scope.entry.comments = [];
 
-    console.log("angular subscribing");
     socket.emit('subscribe', {room: $routeParams.id});
     socket.on('login', function () {
         socket.emit('subscribe', {room: $routeParams.id});
     });
     socket.on('initialuserlist', function (data) {
-        console.log('initialize user list');
-        console.log(data);
         $scope.viewers = data;
     });
 
@@ -164,15 +146,12 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
             });
     });
     socket.on('updateusers', function (data) {
-        console.log('updated user list');
-        console.log(data);
         $scope.viewers = data;
     });
     socket.on('removeuser', function (data) {
         var viewers = [];
         angular.copy($scope.viewers, viewers);
         angular.forEach($scope.viewers, function (value, key) {
-            console.log(value);
             if (value.id == data) {
                 $scope.viewers.splice(key, 1);
             }
@@ -181,40 +160,41 @@ app.controller('blogEntryCtrl', function ($scope, show, Blog, $routeParams, sock
     $scope.submitComment = function () {
         $scope.entry.comments.unshift({body: $scope.body, date: Date.now()});
         $scope.entry.$save(function (blog) {
-            console.log("saved");
             $scope.comments = blog.comments;
             $scope.body = "";
-//            $scope.comments = BlogsService.getCommentsForBlogEntry($routeParams.id);
             socket.emit('sentcomment', {room: $routeParams.id});
         });
     };
     show.state = true;
     $scope.show = show;
     $scope.$prepareForReady();
+    BlogsService.getBlogFromLocal($routeParams.id,function(blog){
+
+        $scope.entry = blog;
+        $scope.text = blog.text;
+        $scope.comments = blog.comments;
+        $scope.$onReady("success");
+    });
+
+    /*
     Blog.get({id: $routeParams.id}, function (blog) {
-            console.log("got blogs");
             $scope.entry = blog[0];
             $scope.text = blog[0].text;
-            console.log(blog[0].comments);
             $scope.comments = blog[0].comments;
             $scope.$onReady("success");
         },
         function () {
             $scope.$onFailure("failed");
         });
+        */
     $scope.$on('$routeChangeStart', function (scope, next, current) {
-        console.log('Changing from ' + angular.toJson(current) + ' to ' + angular.toJson(next));
-        console.log($routeParams.id);
         socket.emit('unsubscribe', {room: $routeParams.id});
     });
     $scope.$on('$destroy', function () {
-        console.log("Being destroyed");
         socket.removeListener('enterroom');
         socket.removeAllListeners('initialuserlist');
         socket.removeAllListeners('commentsupdated');
         socket.removeAllListeners('updateusers');
-        // or something like
-        // socket.removeListener(this);
     });
 });
 
@@ -226,7 +206,6 @@ app.controller('LoginController', function ($scope, $http, authService, userInfo
         $rootScope.$broadcast('event:auth-loginAttempt');
         $scope.loginAttempt = true;
         $scope.error = "";
-        console.log($scope.form);
         $http.post('/login', $scope.form)
             .success(function (data, status) {
                 userInfoService.setUsername($scope.form.username);
@@ -238,6 +217,7 @@ app.controller('LoginController', function ($scope, $http, authService, userInfo
                 $scope.error = "Failed to connect to server please check your connection";
             });
     };
+    /*
     socket.on('connect', function () {
         console.log("connect");
     });
@@ -267,6 +247,7 @@ app.controller('LoginController', function ($scope, $http, authService, userInfo
             $scope.error = "Username or password is incorrect";
         }
     });
+    */
 
 });
 
@@ -274,9 +255,7 @@ app.controller('RegisterCtrl', function ($scope, $http, $rootScope) {
     $scope.submitRegi = function () {
         $http.post('/register', $scope.form).
             success(function (data) {
-                console.log(data);
                 if (data.fail) {
-                    console.log(data.fail);
                     $scope.message = data.fail;
                 } else {
                     $scope.form = {};
@@ -292,20 +271,23 @@ app.controller('RegisterCtrl', function ($scope, $http, $rootScope) {
 app.controller('UserInfoCtrl', function ($scope, userInfoService, $http) {
     $scope.username = userInfoService.getUsername();
     $scope.logout = function () {
-        console.log("Why u call logout");
         $http.post('/logout').
             success(function () {
-                console.log("success should never come here");
+                //console.log("success should never come here");
             }).error(function () {
-                console.log("error on logout??")
+                //console.log("error on logout??")
             })
     };
     //waiting for a 410 from the authorizer service
     $scope.$on('event:auth-loggedOut', function (event) {
-        //userInfoService.setUsername("Guest");
         $scope.username = "Guest";
         window.location.reload();
 
     })
 
+});
+
+//TODO:add a simple twitter feed here
+app.controller('TwitterCtrl', function ($scope, Blog, Twitter, $routeParams) {
+    $scope.twitterResult = Twitter.get();
 });

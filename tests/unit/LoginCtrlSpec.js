@@ -29,7 +29,6 @@ describe('LoginCtrl tests: ',function(){
         scope.form.username = "test";
 
         scope.submitAuth();
-        console.log(scope.loginAttempt);
         $httpBackend.flush();
         expect(scope.loginAttempt).toBeTruthy();
     });

@@ -43,11 +43,9 @@ describe('blogEntryCtrl test: ', function () {
     });
 
     it('should properly submit comment', function () {
-        console.log("submit comment");
         $httpBackend.flush();
 
         scope.entry.comments = [];
-        console.log(scope.entry.comments);
         scope.entry.comments.push({ body: 'commentbody', date: Date.now(), username: 'raygarner' });
 
         scope.body = "new comment";

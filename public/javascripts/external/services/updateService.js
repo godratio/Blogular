@@ -16,7 +16,6 @@ angular.module('updateService', ['ngResource']).
         }());
         var UpdateService = {
             checkIfUpdate: function (callback) {
-
                 service.get({date: lastUpdate.lastUpdate}, function (result) {
                     var resultToReturn;
                     if (result[0].result == "true") {

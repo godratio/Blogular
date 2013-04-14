@@ -9,7 +9,6 @@ angular.module('socketio', []).
             'max reconnection attempts': 10
 
         });
-        console.log("connecting");
         return {
             connect: function () {
                io.connect('', {
@@ -23,7 +22,6 @@ angular.module('socketio', []).
             },
             reconnect: function () {
                 socket.socket.reconnect();
-                console.log('attempted to connect');
             },
             on: function (eventName, callback) {
                 socket.on(eventName, function () {

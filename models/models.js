@@ -9,6 +9,7 @@ var blogSchema = mongoose.Schema({
         { body: String, date: Date, username: String }
     ],
     date: { type: Date, default: Date.now },
+    updateDate:{type:Date,default:Date.now},
     hidden: Boolean,
     meta: {
         votes: Number,
