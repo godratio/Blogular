@@ -1,5 +1,5 @@
 #  OLD PROJECT NO LONGER BEING DEVELOPED #
-Just leaving here for historical reason but I havent touched this in many years.
+Just leaving this here for historical reasons but I havent touched this in many years.
 
 
 
