@@ -1,3 +1,8 @@
+#  OLD PROJECT NO LONGER BEING DEVELOPED #
+Just leaving here for historical reason but I havent touched this in many years.
+
+
+
 # Blogular  #
 ##Please be aware we are still in alpha many things are not user friendly yet##
 ###If you would like to contribute please see bottom of readme###
